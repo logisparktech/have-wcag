@@ -424,12 +424,9 @@ export function createPanel(
   resetBtn.textContent = "Reset All Settings";
   resetBtn.addEventListener("click", () => {
     resetAll();
-    // Trigger reset callback if provided
-    if (onReset) {
-      onReset();
-    }
+    // Dispatch custom event to notify the widget to refresh panel
+    document.dispatchEvent(new CustomEvent("hwcag:reset"));
   });
-
   content.appendChild(resetBtn);
 
   panel.appendChild(header);

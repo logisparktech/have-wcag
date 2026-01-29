@@ -53,20 +53,34 @@ function handleEscapeKey(e: KeyboardEvent): void {
 }
 
 /**
- * Refresh panel after settings reset
+ * Refresh the panel UI (used after reset)
  */
 function refreshPanel(): void {
   if (!panelElement) return;
 
-  const newPanel = createPanel(currentConfig, refreshPanel);
+  const wasOpen = panelElement.classList.contains("open");
+  const newPanel = createPanel(currentConfig);
+
+  // Preserve open state
+  if (wasOpen) {
+    newPanel.classList.add("open");
+  }
+
   panelElement.replaceWith(newPanel);
   panelElement = newPanel;
 
-  // Reattach event listener to new close button
+  // Re-attach close button listener
   const closeBtn = panelElement.querySelector(".hwcag-panel-close");
   if (closeBtn) {
     closeBtn.addEventListener("click", closePanel);
   }
+}
+
+/**
+ * Handle reset event from panel
+ */
+function handleResetEvent(): void {
+  refreshPanel();
 }
 
 /**
@@ -82,7 +96,7 @@ export function init(config: WidgetConfig = {}): void {
 
   // Create UI elements
   buttonElement = createButton(currentConfig);
-  panelElement = createPanel(currentConfig, refreshPanel);
+  panelElement = createPanel(currentConfig);
 
   // Set up event listeners
   buttonElement.addEventListener("click", togglePanel);
@@ -94,6 +108,7 @@ export function init(config: WidgetConfig = {}): void {
 
   document.addEventListener("click", handleClickOutside);
   document.addEventListener("keydown", handleEscapeKey);
+  document.addEventListener("hwcag:reset", handleResetEvent);
 
   // Add to DOM
   document.body.appendChild(panelElement);
@@ -112,6 +127,7 @@ export function destroy(): void {
   // Remove event listeners
   document.removeEventListener("click", handleClickOutside);
   document.removeEventListener("keydown", handleEscapeKey);
+  document.removeEventListener("hwcag:reset", handleResetEvent);
 
   // Reset all features
   resetAll();
