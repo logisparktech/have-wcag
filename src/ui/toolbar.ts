@@ -39,6 +39,10 @@ const STYLES = `
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(0,0,0,0.2);
   }
+  .hwcag-toolbar-btn:focus {
+    outline: 3px solid #007bff;
+    outline-offset: 2px;
+  }
   .hwcag-panel {
     position: fixed;
     bottom: 150px;
@@ -68,8 +72,12 @@ const STYLES = `
     color: white;
     cursor: pointer;
     font-size: 20px;
-    padding: 0;
+    padding: 4px 8px;
     line-height: 1;
+  }
+  .hwcag-panel-close:focus {
+    outline: 2px solid white;
+    outline-offset: 2px;
   }
   .hwcag-panel-summary {
     display: flex;
@@ -87,8 +95,11 @@ const STYLES = `
     font-weight: 700;
   }
   .hwcag-stat-value.errors { color: #dc3545; }
+  .hwcag-stat-value.errors::before { content: '❌ '; font-size: 16px; }
   .hwcag-stat-value.warnings { color: #ffc107; }
+  .hwcag-stat-value.warnings::before { content: '⚠️ '; font-size: 16px; }
   .hwcag-stat-value.passed { color: #28a745; }
+  .hwcag-stat-value.passed::before { content: '✓ '; font-size: 16px; }
   .hwcag-stat-label { font-size: 12px; color: #6c757d; }
   .hwcag-panel-content {
     max-height: calc(70vh - 140px);
@@ -147,6 +158,10 @@ const STYLES = `
     cursor: pointer;
     transition: background 0.2s;
   }
+  .hwcag-issue-btn:focus {
+    outline: 3px solid #007bff;
+    outline-offset: 2px;
+  }
   .hwcag-issue-btn.highlight {
     background: #e9ecef;
     color: #333;
@@ -162,6 +177,22 @@ const STYLES = `
     color: white;
   }
   .hwcag-issue-btn.copy:hover { background: #1e7e34; }
+  /* Visual severity indicator icons */
+  .hwcag-issue::before {
+    content: '❌';
+    font-size: 12px;
+    margin-right: 6px;
+    position: absolute;
+    top: 12px;
+    left: -2px;
+  }
+  .hwcag-issue.warning::before {
+    content: '⚠️';
+  }
+  .hwcag-issue {
+    position: relative;
+    padding-left: 20px;
+  }
 `;
 
 function injectStyles(): void {
@@ -175,6 +206,11 @@ function injectStyles(): void {
 function createIssueCard(issue: WcagIssue): HTMLElement {
   const card = document.createElement("div");
   card.className = `hwcag-issue ${issue.severity}`;
+  card.setAttribute("role", "article");
+  card.setAttribute(
+    "aria-label",
+    `${issue.severity === "error" ? "Error" : "Warning"}: ${issue.message}`,
+  );
 
   card.innerHTML = `
     <div class="hwcag-issue-header">
@@ -183,9 +219,9 @@ function createIssueCard(issue: WcagIssue): HTMLElement {
     </div>
     <div class="hwcag-issue-message">${issue.message}</div>
     <div class="hwcag-issue-selector">${issue.selector}</div>
-    <div class="hwcag-issue-actions">
-      <button class="hwcag-issue-btn highlight">Highlight</button>
-      ${issue.suggestion ? '<button class="hwcag-issue-btn preview">Preview Fix</button>' : ""}
+    <div class="hwcag-issue-actions" role="group" aria-label="Actions">
+      <button class="hwcag-issue-btn highlight" aria-pressed="false">Highlight</button>
+      ${issue.suggestion ? '<button class="hwcag-issue-btn preview" aria-pressed="false">Preview Fix</button>' : ""}
       ${issue.suggestion ? '<button class="hwcag-issue-btn copy">Copy CSS</button>' : ""}
     </div>
   `;
@@ -197,10 +233,12 @@ function createIssueCard(issue: WcagIssue): HTMLElement {
     if (isHighlighted) {
       removeHighlight(issue.element);
       highlightBtn.textContent = "Highlight";
+      highlightBtn.setAttribute("aria-pressed", "false");
     } else {
       highlightElement(issue.element);
       issue.element.scrollIntoView({ behavior: "smooth", block: "center" });
       highlightBtn.textContent = "Remove";
+      highlightBtn.setAttribute("aria-pressed", "true");
     }
     isHighlighted = !isHighlighted;
   });
@@ -216,12 +254,14 @@ function createIssueCard(issue: WcagIssue): HTMLElement {
       if (isPreviewing) {
         issue.element.setAttribute("style", originalStyle);
         previewBtn.textContent = "Preview Fix";
+        previewBtn.setAttribute("aria-pressed", "false");
       } else {
         originalStyle = issue.element.getAttribute("style") || "";
         if (issue.type === "contrast" && suggestion.textColor) {
           issue.element.style.color = suggestion.textColor;
         }
         previewBtn.textContent = "Revert";
+        previewBtn.setAttribute("aria-pressed", "true");
       }
       isPreviewing = !isPreviewing;
     });
@@ -330,18 +370,21 @@ export function createToolbar(config: ToolbarConfig): void {
   // Create toolbar button
   toolbarElement = document.createElement("div");
   toolbarElement.className = "hwcag-toolbar";
-  toolbarElement.innerHTML = `<button class="hwcag-toolbar-btn">♿ Audit Accessibility</button>`;
+  toolbarElement.innerHTML = `<button class="hwcag-toolbar-btn" aria-label="Audit Accessibility" aria-expanded="false" aria-haspopup="dialog">♿ Audit Accessibility</button>`;
 
   // Create panel
   panelElement = document.createElement("div");
   panelElement.className = "hwcag-panel";
+  panelElement.setAttribute("role", "dialog");
+  panelElement.setAttribute("aria-modal", "true");
+  panelElement.setAttribute("aria-labelledby", "hwcag-audit-title");
   panelElement.innerHTML = `
     <div class="hwcag-panel-header">
-      <span class="hwcag-panel-title">have-wcag Audit</span>
-      <button class="hwcag-panel-close">×</button>
+      <span class="hwcag-panel-title" id="hwcag-audit-title">have-wcag Audit</span>
+      <button class="hwcag-panel-close" aria-label="Close audit panel">×</button>
     </div>
-    <div class="hwcag-panel-summary"></div>
-    <div class="hwcag-panel-content">
+    <div class="hwcag-panel-summary" role="region" aria-label="Audit summary"></div>
+    <div class="hwcag-panel-content" role="region" aria-label="Audit results" aria-live="polite">
       <p style="text-align:center;color:#6c757d;padding:20px;">Click "Audit" to scan this page</p>
     </div>
   `;
@@ -355,11 +398,13 @@ export function createToolbar(config: ToolbarConfig): void {
       // Toggle panel if already open
       if (panelElement!.classList.contains("open")) {
         panelElement!.classList.remove("open");
+        btn.setAttribute("aria-expanded", "false");
         removeAllHighlights();
         return;
       }
 
       btn.textContent = "⏳ Scanning...";
+      btn.setAttribute("aria-expanded", "true");
 
       // Clear previous results and highlights
       removeAllHighlights();
@@ -393,6 +438,8 @@ export function createToolbar(config: ToolbarConfig): void {
     .querySelector(".hwcag-panel-close")!
     .addEventListener("click", () => {
       panelElement!.classList.remove("open");
+      const btn = toolbarElement?.querySelector("button");
+      btn?.setAttribute("aria-expanded", "false");
       removeAllHighlights();
     });
 

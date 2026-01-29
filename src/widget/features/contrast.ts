@@ -16,12 +16,23 @@ const CONTRAST_CSS = `
   }
   
   /* Remove backgrounds and ensure text visibility */
-  html.hwcag-high-contrast *:not(.hwcag-widget):not(.hwcag-widget *):not(.hwcag-widget-panel):not(.hwcag-widget-panel *):not(.hwcag-widget-button):not(.hwcag-toolbar):not(.hwcag-toolbar *):not(.hwcag-panel):not(.hwcag-panel *) {
+  html.hwcag-high-contrast *:not(.hwcag-widget):not(.hwcag-widget *):not(.hwcag-widget-panel):not(.hwcag-widget-panel *):not(.hwcag-widget-button):not(.hwcag-toolbar):not(.hwcag-toolbar *):not(.hwcag-panel):not(.hwcag-panel *):not(#hwcag-reading-guide) {
     background-color: #000000 !important;
     color: #ffffff !important;
     border-color: #ffffff !important;
     text-shadow: none !important;
     box-shadow: none !important;
+  }
+  
+  /* Preserve reading guide styles */
+  html.hwcag-high-contrast #hwcag-reading-guide {
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 0, 0.2) 0%,
+      rgba(255, 255, 0, 0.4) 50%,
+      rgba(255, 255, 0, 0.2) 100%
+    ) !important;
+    border-color: rgba(255, 200, 0, 0.7) !important;
   }
   
   /* Links - Yellow for high visibility */
@@ -119,7 +130,7 @@ const CONTRAST_CSS = `
     color: #ffffff !important;
   }
   
-  html.hwcag-high-contrast.hwcag-dark-mode *:not(.hwcag-widget):not(.hwcag-widget *):not(.hwcag-widget-panel):not(.hwcag-widget-panel *):not(.hwcag-widget-button):not(.hwcag-toolbar):not(.hwcag-toolbar *):not(.hwcag-panel):not(.hwcag-panel *) {
+  html.hwcag-high-contrast.hwcag-dark-mode *:not(.hwcag-widget):not(.hwcag-widget *):not(.hwcag-widget-panel):not(.hwcag-widget-panel *):not(.hwcag-widget-button):not(.hwcag-toolbar):not(.hwcag-toolbar *):not(.hwcag-panel):not(.hwcag-panel *):not(#hwcag-reading-guide) {
     background-color: #000000 !important;
     color: #ffffff !important;
   }

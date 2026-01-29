@@ -18,10 +18,20 @@ const DARK_MODE_CSS = `
     color: #e8e8e8 !important;
   }
   
-  /* Apply dark theme to all elements except widget */
-  html.hwcag-dark-mode *:not(.hwcag-widget):not(.hwcag-widget *):not(.hwcag-widget-panel):not(.hwcag-widget-panel *):not(.hwcag-widget-button):not(.hwcag-toolbar):not(.hwcag-toolbar *):not(.hwcag-panel):not(.hwcag-panel *) {
+  /* Apply dark theme to all elements except widget and reading guide */
+  html.hwcag-dark-mode *:not(.hwcag-widget):not(.hwcag-widget *):not(.hwcag-widget-panel):not(.hwcag-widget-panel *):not(.hwcag-widget-button):not(.hwcag-toolbar):not(.hwcag-toolbar *):not(.hwcag-panel):not(.hwcag-panel *):not(#hwcag-reading-guide) {
     background-color: inherit;
     color: inherit;
+  }
+  
+  /* Preserve reading guide styles in dark mode */
+  html.hwcag-dark-mode #hwcag-reading-guide {
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 0, 0.15) 0%,
+      rgba(255, 255, 0, 0.3) 50%,
+      rgba(255, 255, 0, 0.15) 100%
+    ) !important;
   }
   
   /* Card and section backgrounds */
@@ -159,4 +169,4 @@ export const darkModeFeature: FeatureModule = {
   reset,
 };
 
-export default darkModeFeature; 
+export default darkModeFeature;
