@@ -73,6 +73,11 @@ function getPanelStyles(position: string): string {
     .hwcag-panel-close:hover {
       opacity: 1;
     }
+    .hwcag-panel-close:focus {
+      opacity: 1;
+      outline: 2px solid white;
+      outline-offset: 2px;
+    }
     .hwcag-panel-content {
       padding: 16px;
       max-height: 380px;
@@ -145,6 +150,10 @@ function getPanelStyles(position: string): string {
     .hwcag-toggle.active::after {
       transform: translateX(22px);
     }
+    .hwcag-toggle:focus {
+      outline: 3px solid var(--hwcag-accent);
+      outline-offset: 2px;
+    }
     .hwcag-stepper {
       display: flex;
       align-items: center;
@@ -168,6 +177,10 @@ function getPanelStyles(position: string): string {
     .hwcag-stepper-btn:hover {
       opacity: 0.85;
     }
+    .hwcag-stepper-btn:focus {
+      outline: 3px solid var(--hwcag-accent);
+      outline-offset: 2px;
+    }
     .hwcag-stepper-value {
       min-width: 40px;
       text-align: center;
@@ -189,6 +202,10 @@ function getPanelStyles(position: string): string {
       background: var(--hwcag-primary);
       color: white;
     }
+    .hwcag-select-btn:focus {
+      outline: 3px solid var(--hwcag-accent);
+      outline-offset: 2px;
+    }
     .hwcag-reset-btn {
       width: 100%;
       padding: 12px;
@@ -205,6 +222,10 @@ function getPanelStyles(position: string): string {
     .hwcag-reset-btn:hover {
       background: #c82333;
     }
+    .hwcag-reset-btn:focus {
+      outline: 3px solid var(--hwcag-accent);
+      outline-offset: 2px;
+    }
   `;
 }
 
@@ -215,16 +236,19 @@ function createToggle(
   feature: WidgetFeature,
   initialValue: boolean,
   onChange: () => void,
+  label: string,
 ): HTMLElement {
   const toggle = document.createElement("button");
   toggle.className = `hwcag-toggle ${initialValue ? "active" : ""}`;
   toggle.setAttribute("role", "switch");
   toggle.setAttribute("aria-checked", String(initialValue));
+  toggle.setAttribute("aria-label", `${label}: ${initialValue ? "On" : "Off"}`);
 
   toggle.addEventListener("click", () => {
     onChange();
     const isActive = toggle.classList.toggle("active");
     toggle.setAttribute("aria-checked", String(isActive));
+    toggle.setAttribute("aria-label", `${label}: ${isActive ? "On" : "Off"}`);
   });
 
   return toggle;
@@ -238,23 +262,28 @@ function createStepper(
   getValue: () => number,
   onIncrease: () => number,
   onDecrease: () => number,
+  label: string,
 ): HTMLElement {
   const container = document.createElement("div");
   container.className = "hwcag-stepper";
+  container.setAttribute("role", "group");
+  container.setAttribute("aria-label", label);
 
   const decreaseBtn = document.createElement("button");
   decreaseBtn.className = "hwcag-stepper-btn";
   decreaseBtn.textContent = "−";
-  decreaseBtn.setAttribute("aria-label", "Decrease");
+  decreaseBtn.setAttribute("aria-label", `Decrease ${label}`);
 
   const valueDisplay = document.createElement("span");
   valueDisplay.className = "hwcag-stepper-value";
   valueDisplay.textContent = formatStepperValue(getValue());
+  valueDisplay.setAttribute("aria-live", "polite");
+  valueDisplay.setAttribute("aria-atomic", "true");
 
   const increaseBtn = document.createElement("button");
   increaseBtn.className = "hwcag-stepper-btn";
   increaseBtn.textContent = "+";
-  increaseBtn.setAttribute("aria-label", "Increase");
+  increaseBtn.setAttribute("aria-label", `Increase ${label}`);
 
   decreaseBtn.addEventListener("click", () => {
     const newVal = onDecrease();
@@ -288,14 +317,18 @@ function createSelect(
   feature: WidgetFeature,
   getValue: () => string,
   onCycle: () => string,
+  label: string,
 ): HTMLElement {
   const btn = document.createElement("button");
   btn.className = "hwcag-select-btn";
   btn.textContent = getValue();
+  btn.setAttribute("aria-label", `${label}: ${getValue()}`);
+  btn.setAttribute("aria-live", "polite");
 
   btn.addEventListener("click", () => {
     const newVal = onCycle();
     btn.textContent = newVal;
+    btn.setAttribute("aria-label", `${label}: ${newVal}`);
   });
 
   return btn;
@@ -318,9 +351,12 @@ function createFeatureRow(featureName: WidgetFeature): HTMLElement {
   const icon = document.createElement("div");
   icon.className = "hwcag-feature-icon";
   icon.textContent = feature.icon;
+  icon.setAttribute("aria-hidden", "true"); // Decorative icon
 
+  const labelId = `hwcag-label-${featureName}`;
   const label = document.createElement("span");
   label.className = "hwcag-feature-label";
+  label.id = labelId;
   label.textContent = feature.label;
 
   info.appendChild(icon);
@@ -338,6 +374,7 @@ function createFeatureRow(featureName: WidgetFeature): HTMLElement {
         featureName,
         (actions as any).getValue(),
         (actions as any).toggle,
+        feature.label,
       );
       break;
     case "stepper":
@@ -346,6 +383,7 @@ function createFeatureRow(featureName: WidgetFeature): HTMLElement {
         (actions as any).getValue,
         (actions as any).increase,
         (actions as any).decrease,
+        feature.label,
       );
       break;
     case "select":
@@ -353,6 +391,7 @@ function createFeatureRow(featureName: WidgetFeature): HTMLElement {
         featureName,
         (actions as any).getValue,
         (actions as any).cycle,
+        feature.label,
       );
       break;
     default:
@@ -370,10 +409,7 @@ function createFeatureRow(featureName: WidgetFeature): HTMLElement {
 /**
  * Create the panel element
  */
-export function createPanel(
-  config: WidgetConfig,
-  onReset?: () => void,
-): HTMLElement {
+export function createPanel(config: WidgetConfig): HTMLElement {
   const settings = { ...DEFAULT_CONFIG, ...config };
   const theme = { ...DEFAULT_CONFIG.theme, ...config.theme };
 
@@ -391,7 +427,8 @@ export function createPanel(
   panel.className = "hwcag-widget hwcag-widget-panel";
   panel.style.cssText = getThemeCSS(theme);
   panel.setAttribute("role", "dialog");
-  panel.setAttribute("aria-label", settings.panelTitle);
+  panel.setAttribute("aria-modal", "true");
+  panel.setAttribute("aria-labelledby", "hwcag-panel-title");
 
   // Header
   const header = document.createElement("div");
@@ -399,6 +436,7 @@ export function createPanel(
 
   const title = document.createElement("h2");
   title.className = "hwcag-panel-title";
+  title.id = "hwcag-panel-title";
   title.textContent = settings.panelTitle;
 
   const closeBtn = document.createElement("button");
@@ -427,6 +465,7 @@ export function createPanel(
     // Dispatch custom event to notify the widget to refresh panel
     document.dispatchEvent(new CustomEvent("hwcag:reset"));
   });
+
   content.appendChild(resetBtn);
 
   panel.appendChild(header);
