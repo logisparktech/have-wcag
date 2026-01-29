@@ -1,0 +1,100 @@
+import resolve from "@rollup/plugin-node-resolve";
+import commonjs from "@rollup/plugin-commonjs";
+import typescript from "@rollup/plugin-typescript";
+import terser from "@rollup/plugin-terser";
+
+const production = !process.env.ROLLUP_WATCH;
+
+// Shared plugins
+const plugins = (outDir = "dist") => [
+  resolve(),
+  commonjs(),
+  typescript({
+    tsconfig: "./tsconfig.json",
+    declarationDir: outDir + "/types",
+  }),
+  production && terser(),
+];
+
+export default [
+  // Main ESM build (widget + auditor)
+  {
+    input: "src/index.ts",
+    output: {
+      file: "dist/index.esm.js",
+      format: "esm",
+      sourcemap: true,
+    },
+    plugins: plugins(),
+  },
+
+  // Main CommonJS build (widget + auditor)
+  {
+    input: "src/index.ts",
+    output: {
+      file: "dist/index.js",
+      format: "cjs",
+      sourcemap: true,
+      exports: "named",
+    },
+    plugins: plugins(),
+  },
+
+  // Widget only - ESM
+  {
+    input: "src/widget/index.ts",
+    output: {
+      file: "dist/widget.esm.js",
+      format: "esm",
+      sourcemap: true,
+    },
+    plugins: plugins(),
+  },
+
+  // Widget only - Browser bundle
+  {
+    input: "src/widget/index.ts",
+    output: {
+      file: "dist/widget.js",
+      format: "iife",
+      name: "HaveWcagWidget",
+      sourcemap: true,
+    },
+    plugins: plugins(),
+  },
+
+  // Auditor only - ESM
+  {
+    input: "src/auditor/index.ts",
+    output: {
+      file: "dist/auditor.esm.js",
+      format: "esm",
+      sourcemap: true,
+    },
+    plugins: plugins(),
+  },
+
+  // Auditor only - Browser bundle
+  {
+    input: "src/auditor/index.ts",
+    output: {
+      file: "dist/auditor.js",
+      format: "iife",
+      name: "HaveWcagAuditor",
+      sourcemap: true,
+    },
+    plugins: plugins(),
+  },
+
+  // Full bundle (auto-initializing)
+  {
+    input: "src/auto.ts",
+    output: {
+      file: "dist/bundle.js",
+      format: "iife",
+      name: "HaveWcag",
+      sourcemap: true,
+    },
+    plugins: plugins(),
+  },
+];

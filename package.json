@@ -1,0 +1,67 @@
+{
+  "name": "have-wcag",
+  "version": "1.0.0",
+  "description": "WCAG accessibility toolkit - Widget for users & Auditor for developers",
+  "main": "dist/index.js",
+  "type": "module",
+  "module": "dist/index.esm.js",
+  "browser": "dist/bundle.js",
+  "types": "dist/types/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.esm.js",
+      "require": "./dist/index.js",
+      "types": "./dist/types/index.d.ts"
+    },
+    "./widget": {
+      "import": "./dist/widget.esm.js",
+      "require": "./dist/widget.js",
+      "types": "./dist/types/widget/index.d.ts"
+    },
+    "./auditor": {
+      "import": "./dist/auditor.esm.js",
+      "require": "./dist/auditor.js",
+      "types": "./dist/types/auditor/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "rollup -c",
+    "dev": "rollup -c -w",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "accessibility",
+    "a11y",
+    "wcag",
+    "audit",
+    "contrast",
+    "keyboard",
+    "widget",
+    "have-wcag"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^25.0.0",
+    "@rollup/plugin-node-resolve": "^15.0.0",
+    "@rollup/plugin-terser": "^0.4.0",
+    "@rollup/plugin-typescript": "^11.0.0",
+    "rollup": "^4.0.0",
+    "tslib": "^2.6.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/have-wcag"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/have-wcag/issues"
+  },
+  "homepage": "https://github.com/yourusername/have-wcag#readme"
+}
