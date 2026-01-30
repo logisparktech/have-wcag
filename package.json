@@ -1,7 +1,7 @@
 {
   "name": "have-wcag",
   "version": "1.0.0",
-  "description": "WCAG accessibility toolkit - Widget for users & Auditor for developers",
+  "description": "WCAG accessibility toolkit - Widget for users ",
   "main": "dist/index.js",
   "type": "module",
   "module": "dist/index.esm.js",
