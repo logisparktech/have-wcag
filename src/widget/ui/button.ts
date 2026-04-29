@@ -55,6 +55,22 @@ const BUTTON_STYLES = `
     justify-content: center !important;
     transition: transform 0.2s, box-shadow 0.2s, background 0.2s !important;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+    /* CSS Reset to prevent inherited accessibility settings from affecting the button */
+    font-size: 16px !important;
+    line-height: 1 !important;
+    letter-spacing: normal !important;
+    word-spacing: normal !important;
+    text-align: center !important;
+    text-transform: none !important;
+  }
+  .hwcag-widget-button * {
+    font-family: inherit !important;
+    font-size: inherit !important;
+    line-height: inherit !important;
+    letter-spacing: inherit !important;
+    word-spacing: inherit !important;
+    text-align: inherit !important;
+    text-transform: inherit !important;
   }
   .hwcag-widget-button::before {
     content: '';
@@ -136,6 +152,8 @@ export function createButton(config: WidgetConfig): HTMLElement {
 
   const button = document.createElement("button");
   button.className = "hwcag-widget hwcag-widget-button";
+  button.title = 'Accessibility Settings';
+  button.ariaLabel = 'Accessibility Settings';
   button.style.cssText = getThemeCSS(theme) + getPositionStyles(settings.position);
   button.innerHTML = ACCESSIBILITY_ICON;
   button.setAttribute("aria-label", settings.buttonLabel);

@@ -7,26 +7,23 @@ const STYLE_ID = "hwcag-dark-mode-styles";
  * Uses CSS custom properties for smooth theme application
  */
 const DARK_MODE_CSS = `
+  /* Ensure the HTML background is dark so edges and scrollbars look right */
   html.hwcag-dark-mode {
+    background-color: #121212 !important;
+  }
+  
+  /* Apply dark mode filter to all body children except the widget and overlays */
+  html.hwcag-dark-mode body > *:not(.hwcag-widget):not(.hwcag-ps-overlay):not(.hwcag-sr-controls):not(.hwcag-sr-hint):not(.hwcag-toolbar) {
     filter: invert(1) hue-rotate(180deg) brightness(0.95) !important;
   }
   
   /* Double invert for images and media to preserve original colors */
-  html.hwcag-dark-mode img,
-  html.hwcag-dark-mode video,
-  html.hwcag-dark-mode iframe,
-  html.hwcag-dark-mode canvas,
-  html.hwcag-dark-mode picture {
+  html.hwcag-dark-mode body > *:not(.hwcag-widget) img,
+  html.hwcag-dark-mode body > *:not(.hwcag-widget) video,
+  html.hwcag-dark-mode body > *:not(.hwcag-widget) iframe,
+  html.hwcag-dark-mode body > *:not(.hwcag-widget) canvas,
+  html.hwcag-dark-mode body > *:not(.hwcag-widget) picture {
     filter: invert(1) hue-rotate(180deg) !important;
-  }
-
-  /* Protect widget UI from being inverted by the html filter */
-  html.hwcag-dark-mode .hwcag-widget-panel,
-  html.hwcag-dark-mode .hwcag-widget-button,
-  html.hwcag-dark-mode .hwcag-ps-overlay,
-  html.hwcag-dark-mode .hwcag-sr-controls,
-  html.hwcag-dark-mode .hwcag-toolbar {
-    filter: invert(1) hue-rotate(180deg) brightness(1.05) !important;
   }
 `;
 

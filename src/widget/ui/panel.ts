@@ -275,6 +275,29 @@ function getPanelStyles(position: string): string {
       outline: 3px solid var(--hwcag-accent);
       outline-offset: 2px;
     }
+    /* Snackbar */
+    .hwcag-snackbar {
+      position: absolute;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #10b981;
+      color: white;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s, transform 0.3s;
+      z-index: 100;
+      white-space: nowrap;
+    }
+    .hwcag-snackbar.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
   `;
 }
 
@@ -372,6 +395,7 @@ function createToggleCard(
     card.setAttribute("aria-checked", String(isActive));
     card.setAttribute("aria-label", `${labelText}: ${isActive ? "On" : "Off"}`);
     toggle.update(isActive);
+    document.dispatchEvent(new CustomEvent("hwcag:stateChange"));
   });
 
   return card;
@@ -428,6 +452,7 @@ function createStepperCard(
       `${labelText}: level ${currentLevel} of ${numLevels - 1}`,
     );
     dots.update(currentLevel);
+    document.dispatchEvent(new CustomEvent("hwcag:stateChange"));
   });
 
   return card;
@@ -499,6 +524,7 @@ function createSelectCard(
     }
     
     dots.update(currentIndex);
+    document.dispatchEvent(new CustomEvent("hwcag:stateChange"));
   });
 
   return card;

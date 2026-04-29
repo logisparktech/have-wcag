@@ -7,19 +7,14 @@ const STYLE_ID = "hwcag-invert-styles";
  * Inverts all colors on the page except for the widget and some media elements
  */
 const INVERT_CSS = `
+  /* Ensure the HTML background is light/white so edges look right */
   html.hwcag-invert {
-    filter: invert(100%) !important;
-    background-color: #fff !important;
+    background-color: #ffffff !important;
   }
   
-  /* Only re-invert the widget to keep it readable and usable */
-  html.hwcag-invert .hwcag-widget {
+  /* Apply invert filter to all body children except the widget and overlays */
+  html.hwcag-invert body > *:not(.hwcag-widget):not(.hwcag-ps-overlay):not(.hwcag-sr-controls):not(.hwcag-sr-hint):not(.hwcag-toolbar) {
     filter: invert(100%) !important;
-  }
-  
-  /* Ensure background is covered */
-  html.hwcag-invert body {
-    background-color: inherit !important;
   }
 `;
 

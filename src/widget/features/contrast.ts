@@ -28,56 +28,56 @@ const CONTRAST_CSS = `
   }
   
   /* Links - Yellow for high visibility */
-  html.hwcag-high-contrast a:not(.hwcag-widget *),
-  html[data-hwcag-contrast] a:not(.hwcag-widget *) {
+  html.hwcag-high-contrast a:not(.hwcag-widget):not(.hwcag-widget *),
+  html[data-hwcag-contrast] a:not(.hwcag-widget):not(.hwcag-widget *) {
     color: #ffff00 !important;
     text-decoration: underline !important;
     font-weight: bold !important;
   }
   
-  html.hwcag-high-contrast a:hover:not(.hwcag-widget *),
-  html[data-hwcag-contrast] a:hover:not(.hwcag-widget *) {
+  html.hwcag-high-contrast a:hover:not(.hwcag-widget):not(.hwcag-widget *),
+  html[data-hwcag-contrast] a:hover:not(.hwcag-widget):not(.hwcag-widget *) {
     color: #00ffff !important;
     outline: 2px solid #00ffff !important;
   }
   
   /* Form elements */
-  html.hwcag-high-contrast input:not(.hwcag-widget *),
-  html.hwcag-high-contrast textarea:not(.hwcag-widget *),
-  html.hwcag-high-contrast select:not(.hwcag-widget *),
-  html[data-hwcag-contrast] input:not(.hwcag-widget *),
-  html[data-hwcag-contrast] textarea:not(.hwcag-widget *),
-  html[data-hwcag-contrast] select:not(.hwcag-widget *) {
+  html.hwcag-high-contrast input:not(.hwcag-widget):not(.hwcag-widget *),
+  html.hwcag-high-contrast textarea:not(.hwcag-widget):not(.hwcag-widget *),
+  html.hwcag-high-contrast select:not(.hwcag-widget):not(.hwcag-widget *),
+  html[data-hwcag-contrast] input:not(.hwcag-widget):not(.hwcag-widget *),
+  html[data-hwcag-contrast] textarea:not(.hwcag-widget):not(.hwcag-widget *),
+  html[data-hwcag-contrast] select:not(.hwcag-widget):not(.hwcag-widget *) {
     background-color: #000000 !important;
     color: #ffffff !important;
     border: 3px solid #ffffff !important;
   }
   
   /* Buttons */
-  html.hwcag-high-contrast button:not(.hwcag-widget *),
-  html[data-hwcag-contrast] button:not(.hwcag-widget *) {
+  html.hwcag-high-contrast button:not(.hwcag-widget):not(.hwcag-widget *),
+  html[data-hwcag-contrast] button:not(.hwcag-widget):not(.hwcag-widget *) {
     background-color: #ffffff !important;
     color: #000000 !important;
     border: 3px solid #ffffff !important;
     font-weight: bold !important;
   }
   
-  html.hwcag-high-contrast button:hover:not(.hwcag-widget *),
-  html[data-hwcag-contrast] button:hover:not(.hwcag-widget *) {
+  html.hwcag-high-contrast button:hover:not(.hwcag-widget):not(.hwcag-widget *),
+  html[data-hwcag-contrast] button:hover:not(.hwcag-widget):not(.hwcag-widget *) {
     background-color: #ffff00 !important;
     color: #000000 !important;
   }
   
   /* Focus indicators */
-  html.hwcag-high-contrast *:focus:not(.hwcag-widget *),
-  html[data-hwcag-contrast] *:focus:not(.hwcag-widget *) {
+  html.hwcag-high-contrast *:focus:not(.hwcag-widget):not(.hwcag-widget *),
+  html[data-hwcag-contrast] *:focus:not(.hwcag-widget):not(.hwcag-widget *) {
     outline: 4px solid #ffff00 !important;
     outline-offset: 2px !important;
   }
   
   /* Images - high contrast enhancement */
-  html.hwcag-high-contrast img:not(.hwcag-widget *),
-  html[data-hwcag-contrast] img:not(.hwcag-widget *) {
+  html.hwcag-high-contrast img:not(.hwcag-widget):not(.hwcag-widget *),
+  html[data-hwcag-contrast] img:not(.hwcag-widget):not(.hwcag-widget *) {
     filter: contrast(1.5) grayscale(1) !important;
     border: 2px solid #ffffff !important;
   }

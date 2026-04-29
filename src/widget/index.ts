@@ -2,12 +2,56 @@ import type { WidgetConfig } from "./types";
 import { DEFAULT_CONFIG } from "./types";
 import { createButton } from "./ui/button";
 import { createPanel } from "./ui/panel";
-import { resetAll } from "./features";
+import { resetAll, featureActions, features } from "./features";
 
 let isInitialized = false;
 let buttonElement: HTMLElement | null = null;
 let panelElement: HTMLElement | null = null;
 let currentConfig: WidgetConfig = {};
+
+const STATE_KEY = "hwcag-state";
+
+/**
+ * Get current state across all features
+ */
+function getCurrentState(): Record<string, any> {
+  const state: Record<string, any> = {};
+  Object.entries(featureActions).forEach(([key, actions]) => {
+    state[key] = (actions as any).getValue();
+  });
+  return state;
+}
+
+/**
+ * Save current state to localStorage
+ */
+function saveState(): void {
+  try {
+    const state = getCurrentState();
+    localStorage.setItem(STATE_KEY, JSON.stringify(state));
+  } catch (e) {
+    console.error("hwcag: Failed to save state to localStorage", e);
+  }
+}
+
+/**
+ * Load state from localStorage
+ */
+function loadState(): void {
+  try {
+    const stateStr = localStorage.getItem(STATE_KEY);
+    if (!stateStr) return;
+    const state = JSON.parse(stateStr);
+    
+    Object.entries(features).forEach(([key, feature]) => {
+      if (state[key] !== undefined) {
+        feature.apply(state[key]);
+      }
+    });
+  } catch (e) {
+    console.error("hwcag: Failed to load state from localStorage", e);
+  }
+}
 
 /**
  * Toggle panel visibility
@@ -53,6 +97,10 @@ function handleClickOutside(e: MouseEvent): void {
   if (!panelElement || !buttonElement) return;
 
   const target = e.target as HTMLElement;
+  
+  // If the target is no longer in the document (e.g. removed during the click handler like in reset), ignore it
+  if (!document.contains(target)) return;
+
   if (!panelElement.contains(target) && !buttonElement.contains(target)) {
     closePanel();
   }
@@ -93,10 +141,32 @@ function refreshPanel(): void {
 }
 
 /**
+ * Show a snackbar message in the panel
+ */
+export function showSnackbar(message: string): void {
+  if (!panelElement) return;
+  const snackbar = document.createElement("div");
+  snackbar.className = "hwcag-snackbar";
+  snackbar.textContent = message;
+  panelElement.appendChild(snackbar);
+  
+  requestAnimationFrame(() => {
+    snackbar.classList.add("show");
+  });
+  
+  setTimeout(() => {
+    snackbar.classList.remove("show");
+    setTimeout(() => snackbar.remove(), 300);
+  }, 3000);
+}
+
+/**
  * Handle reset event from panel
  */
 function handleResetEvent(): void {
+  saveState();
   refreshPanel();
+  showSnackbar("Accessibility settings reset successfully");
 }
 
 /**
@@ -122,9 +192,13 @@ export function init(config: WidgetConfig = {}): void {
     closeBtn.addEventListener("click", closePanel);
   }
 
+  // Load any previously saved state
+  loadState();
+
   document.addEventListener("click", handleClickOutside);
   document.addEventListener("keydown", handleEscapeKey);
   document.addEventListener("hwcag:reset", handleResetEvent);
+  document.addEventListener("hwcag:stateChange", saveState);
 
   // Add to DOM
   document.body.appendChild(panelElement);
@@ -144,6 +218,7 @@ export function destroy(): void {
   document.removeEventListener("click", handleClickOutside);
   document.removeEventListener("keydown", handleEscapeKey);
   document.removeEventListener("hwcag:reset", handleResetEvent);
+  document.removeEventListener("hwcag:stateChange", saveState);
 
   // Reset all features
   resetAll();
