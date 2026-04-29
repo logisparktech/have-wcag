@@ -103,6 +103,7 @@ const PAGE_STRUCTURE_CSS = `
     flex: 1 !important;
     overflow-y: auto !important;
     padding: 8px 0 !important;
+    overscroll-behavior: contain;
   }
   .hwcag-ps-content::-webkit-scrollbar {
     width: 4px;
@@ -495,8 +496,13 @@ function openModal(): void {
   document.addEventListener("keydown", handleEscape);
 
   // Set up MutationObserver for auto-updating
-  observer = new MutationObserver(() => {
+  observer = new MutationObserver((mutations) => {
     if (!isModalOpen) return;
+    // Ignore mutations inside the modal itself to prevent infinite loops
+    const isModalMutation = mutations.every(
+      (m) => overlayEl && overlayEl.contains(m.target)
+    );
+    if (isModalMutation) return;
     cachedNodes = scanPage();
     renderTree(treeContent);
     updateFooter(footer);
