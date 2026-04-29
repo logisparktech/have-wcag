@@ -54,7 +54,7 @@ export function getValue(): number {
 export const textSizeFeature: FeatureModule = {
   name: "textSize",
   label: "Text Size",
-  icon: "Aa",
+  icon: "A▭",
   type: "stepper",
   apply,
   reset,

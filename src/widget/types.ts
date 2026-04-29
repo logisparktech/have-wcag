@@ -18,7 +18,14 @@ export type WidgetFeature =
   | "lineHeight"
   | "linkHighlight"
   | "cursorSize"
-  | "readingGuide";
+  | "readingGuide"
+  | "textSpacing"
+  | "hideImages"
+  | "invert"
+  | "textAlignment"
+  | "stopAnimations"
+  | "pageStructure"
+  | "screenReader";
 
 /**
  * Theme configuration for the widget
@@ -54,6 +61,13 @@ export interface WidgetState {
   linkHighlight: boolean; // highlight all links
   cursorSize: "small" | "medium" | "large";
   readingGuide: boolean; // reading guide/ruler
+  textSpacing: number; // 0 = default, positive = larger spacing, negative = smaller spacing
+  hideImages: boolean; // hide images
+  invert: boolean; // invert colors
+  textAlignment: "default" | "left" | "center" | "right" | "justify";
+  stopAnimations: boolean;
+  pageStructure: boolean;
+  screenReader: boolean;
 }
 
 /**
@@ -65,6 +79,8 @@ export interface FeatureModule {
   icon: string;
   type: "toggle" | "stepper" | "select";
   options?: string[]; // For 'select' type
+  optionLabels?: Record<string, string>; // Display labels for options
+  optionIcons?: Record<string, string>; // Display icons for options
   apply: (value: any) => void;
   reset: () => void;
 }
@@ -83,12 +99,19 @@ export const DEFAULT_CONFIG: Required<WidgetConfig> = {
     "linkHighlight",
     "cursorSize",
     "readingGuide",
+    "textSpacing",
+    "hideImages",
+    "invert",
+    "textAlignment",
+    "stopAnimations",
+    "pageStructure",
+    "screenReader",
   ],
   theme: {
-    primaryColor: "#1a1a2e",
+    primaryColor: "#045fc1",
     backgroundColor: "#ffffff",
     textColor: "#333333",
-    accentColor: "#007bff",
+    accentColor: "#233bb9",
     borderRadius: "12px",
   },
   buttonLabel: "Accessibility Options",
@@ -107,4 +130,11 @@ export const DEFAULT_STATE: WidgetState = {
   linkHighlight: false,
   cursorSize: "small",
   readingGuide: false,
+  textSpacing: 0,
+  hideImages: false,
+  invert: false,
+  textAlignment: "default",
+  stopAnimations: false,
+  pageStructure: false,
+  screenReader: false,
 };

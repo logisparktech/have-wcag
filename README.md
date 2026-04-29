@@ -960,9 +960,9 @@ MIT
 
 ---
 
-## Author
+## Authors
 
-Ruby Shrestha, Logispark Pvt. Ltd.
+Ruby Shrestha, Maheshwor Nagarkoti - Logispark Technologies Pvt. Ltd.
 
 ---
 
@@ -975,4 +975,4 @@ For questions, issues, or suggestions:
 
 ---
 
-**Make the web accessible for everyone with have-wcag! ♿✨**
+**Make the web accessible for everyone with have-wcag! ✨**

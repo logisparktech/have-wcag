@@ -73,7 +73,7 @@ export function getValue(): boolean {
 export const linkHighlightFeature: FeatureModule = {
   name: "linkHighlight",
   label: "Highlight Links",
-  icon: "🔗",
+  icon: "≡",
   type: "toggle",
   apply,
   reset,

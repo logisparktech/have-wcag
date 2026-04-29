@@ -112,7 +112,7 @@ export function getValue(): boolean {
 export const readingGuideFeature: FeatureModule = {
   name: "readingGuide",
   label: "Reading Guide",
-  icon: "―",
+  icon: "‖",
   type: "toggle",
   apply,
   reset,

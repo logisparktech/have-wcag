@@ -36,6 +36,9 @@
         padding-bottom: 8px;
         border-bottom: 1px solid #eee;
       }
+      h3 {
+        margin: 16px 0 8px;
+      }
       .example {
         margin: 16px 0;
         padding: 16px;
@@ -61,198 +64,325 @@
         border-radius: 8px;
         margin: 16px 0;
       }
+      nav ul {
+        list-style: none;
+        display: flex;
+        gap: 16px;
+        padding: 12px 0;
+      }
+      nav a {
+        color: #045fc1;
+        text-decoration: none;
+      }
+      nav a:hover {
+        text-decoration: underline;
+      }
+      article {
+        margin: 16px 0;
+        padding: 20px;
+        background: #fafbff;
+        border-radius: 8px;
+        border: 1px solid #e8eaf0;
+      }
+      article h3 {
+        margin-top: 0;
+      }
+      aside {
+        background: #f0f7ff;
+        padding: 16px;
+        border-radius: 8px;
+        margin: 16px 0;
+        border-left: 4px solid #045fc1;
+      }
     </style>
   </head>
   <body>
-    <h1>have-wcag Test Page</h1>
-    <p class="subtitle">
-      Test both the accessibility widget (bottom-right ♿) and the developer
-      auditor (bottom-left).
-    </p>
+    <header aria-label="Site header">
+      <h1>have-wcag Test Page</h1>
+      <p class="subtitle">
+        Test both the accessibility widget (bottom-right ♿) and the developer
+        auditor (bottom-left).
+      </p>
+    </header>
 
-    <div class="nav-links">
-      <a href="#contrast">Contrast Tests</a>
-      <a href="#keyboard">Keyboard Tests</a>
-      <a href="#text">Text Tests</a>
-      <a href="https://example.com">External Link</a>
-    </div>
+    <nav aria-label="Main navigation">
+      <ul>
+        <li><a href="#sample">Sample Content</a></li>
+        <li><a href="#contrast">Contrast Tests</a></li>
+        <li><a href="#keyboard">Keyboard Tests</a></li>
+        <li><a href="#text">Text Tests</a></li>
+        <li><a href="#articles">Articles</a></li>
+        <li><a href="#reading">Long Content</a></li>
+        <li><a href="https://example.com">External Link</a></li>
+      </ul>
+    </nav>
 
     <!-- SAMPLE CONTENT FOR WIDGET TESTING -->
-    <section>
-      <h2>Sample Content</h2>
-      <p>
-        This is regular paragraph text. Use the accessibility widget (♿ button)
-        to test features like text resizing, high contrast mode, dark mode, and
-        more.
-      </p>
-
-      <div class="card">
-        <h3>Card Title</h3>
+    <main>
+      <section id="sample">
+        <h2>Sample Content</h2>
         <p>
-          This card contains some sample content to test how the accessibility
-          features affect different elements on the page.
+          This is regular paragraph text. Use the accessibility widget (♿ button)
+          to test features like text resizing, high contrast mode, dark mode, and
+          more.
         </p>
-        <a href="#">Learn more</a>
-      </div>
 
-      <p>
-        Here's another paragraph with <a href="#">an inline link</a> to test
-        link highlighting.
+        <div class="card">
+          <h3>Card Title</h3>
+          <p>
+            This card contains some sample content to test how the accessibility
+            features affect different elements on the page.
+          </p>
+          <a href="#">Learn more</a>
+        </div>
+
+        <p>
+          Here's another paragraph with <a href="#">an inline link</a> to test
+          link highlighting.
+        </p>
+
+        <aside aria-label="Quick tip">
+          <h4>Quick Tip</h4>
+          <p>
+            You can test the Screen Reader feature by clicking on any text
+            element. It will highlight the text in yellow and read it aloud.
+          </p>
+        </aside>
+      </section>
+
+      <!-- CONTRAST ISSUES FOR AUDITOR -->
+      <section id="contrast">
+        <h2>Contrast Issues (for Auditor)</h2>
+
+        <div class="example">
+          <div class="example-label">
+            ❌ Low contrast text (light gray on white)
+          </div>
+          <p style="color: #aaaaaa">
+            This text has very poor contrast against the background.
+          </p>
+        </div>
+
+        <div class="example">
+          <div class="example-label">❌ Low contrast text (medium gray)</div>
+          <p style="color: #888888">This text also has insufficient contrast.</p>
+        </div>
+
+        <div class="example">
+          <div class="example-label">✅ Good contrast text</div>
+          <p style="color: #333333">
+            This text has good contrast and should pass.
+          </p>
+        </div>
+
+        <div class="example" style="background: #1a1a2e">
+          <div class="example-label" style="color: #ccc">
+            ❌ Low contrast on dark background
+          </div>
+          <p style="color: #555555">
+            This dark text on dark background is hard to read.
+          </p>
+        </div>
+
+        <div class="example" style="background: #1a1a2e">
+          <div class="example-label" style="color: #ccc">
+            ✅ Good contrast on dark background
+          </div>
+          <p style="color: #ffffff">
+            This white text on dark background is readable.
+          </p>
+        </div>
+      </section>
+
+      <!-- KEYBOARD ISSUES FOR AUDITOR -->
+      <section id="keyboard">
+        <h2>Keyboard Navigation Issues (for Auditor)</h2>
+
+        <div class="example">
+          <div class="example-label">
+            ❌ Clickable div without keyboard access
+          </div>
+          <div
+            onclick="alert('Clicked!')"
+            style="
+              padding: 12px 24px;
+              background: #007bff;
+              color: white;
+              display: inline-block;
+              cursor: pointer;
+              border-radius: 4px;
+            "
+          >
+            Click me (not keyboard accessible)
+          </div>
+        </div>
+
+        <div class="example">
+          <div class="example-label">✅ Proper button element</div>
+          <button
+            onclick="alert('Clicked!')"
+            style="
+              padding: 12px 24px;
+              background: #28a745;
+              color: white;
+              border: none;
+              cursor: pointer;
+              border-radius: 4px;
+            "
+          >
+            Click me (keyboard accessible)
+          </button>
+        </div>
+
+        <div class="example">
+          <div class="example-label">❌ Positive tabindex (disrupts flow)</div>
+          <a href="#" tabindex="5">Link with tabindex="5"</a>
+        </div>
+
+        <div class="example">
+          <div class="example-label">
+            ❌ Custom element with click but no role
+          </div>
+          <span
+            onclick="alert('Clicked!')"
+            style="cursor: pointer; text-decoration: underline; color: #007bff"
+          >
+            Clickable span without role
+          </span>
+        </div>
+      </section>
+
+      <!-- TEXT RESIZE ISSUES FOR AUDITOR -->
+      <section id="text">
+        <h2>Text Resize Issues (for Auditor)</h2>
+
+        <div class="example">
+          <div class="example-label">❌ Font size in pixels</div>
+          <p style="font-size: 14px">
+            This text uses px units which may not scale properly.
+          </p>
+        </div>
+
+        <div class="example">
+          <div class="example-label">✅ Font size in rem</div>
+          <p style="font-size: 1rem">
+            This text uses rem units and will scale with user preferences.
+          </p>
+        </div>
+
+        <div class="example">
+          <div class="example-label">❌ Small font in pixels</div>
+          <p style="font-size: 11px">This small text uses px units.</p>
+        </div>
+      </section>
+
+      <!-- ARTICLES FOR PAGE STRUCTURE TESTING -->
+      <section id="articles">
+        <h2>Articles Section</h2>
+        <p>
+          This section contains multiple articles to test the Page Structure
+          modal's ability to detect nested semantic elements.
+        </p>
+
+        <article>
+          <h3>Understanding WCAG Guidelines</h3>
+          <p>
+            The Web Content Accessibility Guidelines (WCAG) are a set of
+            recommendations for making web content more accessible. They are
+            organized around four principles: perceivable, operable,
+            understandable, and robust.
+          </p>
+          <h4>Perceivable</h4>
+          <p>
+            Information and user interface components must be presentable to
+            users in ways they can perceive. This means that users must be able
+            to perceive the information being presented.
+          </p>
+          <h4>Operable</h4>
+          <p>
+            User interface components and navigation must be operable. This
+            means that users must be able to operate the interface and navigate
+            through the content.
+          </p>
+        </article>
+
+        <article>
+          <h3>Screen Readers and Assistive Technology</h3>
+          <p>
+            Screen readers are a form of assistive technology that converts
+            digital text into synthesized speech or Braille output. They are
+            essential tools for people who are blind or have low vision.
+          </p>
+          <p>
+            Popular screen readers include JAWS, NVDA, VoiceOver (macOS/iOS),
+            and TalkBack (Android). Each has its own set of keyboard shortcuts
+            and navigation methods.
+          </p>
+        </article>
+
+        <article>
+          <h3>Color Contrast Best Practices</h3>
+          <p>
+            WCAG 2.1 requires a contrast ratio of at least 4.5:1 for normal
+            text and 3:1 for large text (AA level). For AAA compliance, the
+            ratios are 7:1 and 4.5:1 respectively.
+          </p>
+        </article>
+      </section>
+
+      <!-- LONG CONTENT FOR READING GUIDE TESTING -->
+      <section id="reading">
+        <h2>Long Content (for Reading Guide & Screen Reader)</h2>
+        <p>
+          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
+          tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
+          veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
+          commodo consequat.
+        </p>
+        <p>
+          Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
+          dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+          proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+        </p>
+
+        <h3>Additional Subsection</h3>
+        <p>
+          Sed ut perspiciatis unde omnis iste natus error sit voluptatem
+          accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab
+          illo inventore veritatis et quasi architecto beatae vitae dicta sunt
+          explicabo.
+        </p>
+        <p>
+          Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut
+          fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem
+          sequi nesciunt.
+        </p>
+
+        <h3>More Reading Content</h3>
+        <p>
+          At vero eos et accusamus et iusto odio dignissimos ducimus qui
+          blanditiis praesentium voluptatum deleniti atque corrupti quos dolores
+          et quas molestias excepturi sint occaecati cupiditate non provident.
+        </p>
+        <p>
+          Similique sunt in culpa qui officia deserunt mollitia animi, id est
+          laborum et dolorum fuga. Et harum quidem rerum facilis est et expedita
+          distinctio.
+        </p>
+      </section>
+
+      <!-- IMAGE CONTENT -->
+      <section>
+        <h2>Image section</h2>
+        <img style="display: block; width: 60%;" src="https://hips.hearstapps.com/hmg-prod/images/shibainu-dog-royalty-free-image-1752089989.pjpeg?crop=1xw:1xh;center,top" alt="alternate image text">
+      </section>
+    </main>
+
+    <footer aria-label="Site footer">
+      <p style="text-align: center; padding: 24px 0; color: #999; font-size: 13px;">
+        © 2026 have-wcag · Built by Logispark Pvt. Ltd.
       </p>
-    </section>
-
-    <!-- CONTRAST ISSUES FOR AUDITOR -->
-    <section id="contrast">
-      <h2>Contrast Issues (for Auditor)</h2>
-
-      <div class="example">
-        <div class="example-label">
-          ❌ Low contrast text (light gray on white)
-        </div>
-        <p style="color: #aaaaaa">
-          This text has very poor contrast against the background.
-        </p>
-      </div>
-
-      <div class="example">
-        <div class="example-label">❌ Low contrast text (medium gray)</div>
-        <p style="color: #888888">This text also has insufficient contrast.</p>
-      </div>
-
-      <div class="example">
-        <div class="example-label">✅ Good contrast text</div>
-        <p style="color: #333333">
-          This text has good contrast and should pass.
-        </p>
-      </div>
-
-      <div class="example" style="background: #1a1a2e">
-        <div class="example-label" style="color: #ccc">
-          ❌ Low contrast on dark background
-        </div>
-        <p style="color: #555555">
-          This dark text on dark background is hard to read.
-        </p>
-      </div>
-
-      <div class="example" style="background: #1a1a2e">
-        <div class="example-label" style="color: #ccc">
-          ✅ Good contrast on dark background
-        </div>
-        <p style="color: #ffffff">
-          This white text on dark background is readable.
-        </p>
-      </div>
-    </section>
-
-    <!-- KEYBOARD ISSUES FOR AUDITOR -->
-    <section id="keyboard">
-      <h2>Keyboard Navigation Issues (for Auditor)</h2>
-
-      <div class="example">
-        <div class="example-label">
-          ❌ Clickable div without keyboard access
-        </div>
-        <div
-          onclick="alert('Clicked!')"
-          style="
-            padding: 12px 24px;
-            background: #007bff;
-            color: white;
-            display: inline-block;
-            cursor: pointer;
-            border-radius: 4px;
-          "
-        >
-          Click me (not keyboard accessible)
-        </div>
-      </div>
-
-      <div class="example">
-        <div class="example-label">✅ Proper button element</div>
-        <button
-          onclick="alert('Clicked!')"
-          style="
-            padding: 12px 24px;
-            background: #28a745;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 4px;
-          "
-        >
-          Click me (keyboard accessible)
-        </button>
-      </div>
-
-      <div class="example">
-        <div class="example-label">❌ Positive tabindex (disrupts flow)</div>
-        <a href="#" tabindex="5">Link with tabindex="5"</a>
-      </div>
-
-      <div class="example">
-        <div class="example-label">
-          ❌ Custom element with click but no role
-        </div>
-        <span
-          onclick="alert('Clicked!')"
-          style="cursor: pointer; text-decoration: underline; color: #007bff"
-        >
-          Clickable span without role
-        </span>
-      </div>
-    </section>
-
-    <!-- TEXT RESIZE ISSUES FOR AUDITOR -->
-    <section id="text">
-      <h2>Text Resize Issues (for Auditor)</h2>
-
-      <div class="example">
-        <div class="example-label">❌ Font size in pixels</div>
-        <p style="font-size: 14px">
-          This text uses px units which may not scale properly.
-        </p>
-      </div>
-
-      <div class="example">
-        <div class="example-label">✅ Font size in rem</div>
-        <p style="font-size: 1rem">
-          This text uses rem units and will scale with user preferences.
-        </p>
-      </div>
-
-      <div class="example">
-        <div class="example-label">❌ Small font in pixels</div>
-        <p style="font-size: 11px">This small text uses px units.</p>
-      </div>
-    </section>
-
-    <!-- LONG CONTENT FOR READING GUIDE TESTING -->
-    <section>
-      <h2>Long Content (for Reading Guide)</h2>
-      <p>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod
-        tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim
-        veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea
-        commodo consequat.
-      </p>
-      <p>
-        Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
-        dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
-        proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-      </p>
-      <p>
-        Sed ut perspiciatis unde omnis iste natus error sit voluptatem
-        accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab
-        illo inventore veritatis et quasi architecto beatae vitae dicta sunt
-        explicabo.
-      </p>
-      <p>
-        Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut
-        fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem
-        sequi nesciunt.
-      </p>
-    </section>
+    </footer>
 
     <!-- Configuration: Enable both widget and auditor -->
     <script>

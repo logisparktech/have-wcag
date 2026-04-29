@@ -15,9 +15,20 @@ let currentConfig: WidgetConfig = {};
 function togglePanel(): void {
   if (!panelElement || !buttonElement) return;
 
+  // Trigger loading animation
+  buttonElement.classList.add("loading");
+
   const isOpen = panelElement.classList.toggle("open");
   buttonElement.classList.toggle("active", isOpen);
   buttonElement.setAttribute("aria-expanded", String(isOpen));
+  
+  // Hide button when open
+  if (isOpen) {
+    buttonElement.style.setProperty("display", "none", "important");
+  } else {
+    buttonElement.style.setProperty("display", "flex", "important");
+    buttonElement.classList.remove("loading");
+  }
 }
 
 /**
@@ -29,6 +40,10 @@ function closePanel(): void {
   panelElement.classList.remove("open");
   buttonElement.classList.remove("active");
   buttonElement.setAttribute("aria-expanded", "false");
+  
+  // Show button when closed
+  buttonElement.style.setProperty("display", "flex", "important");
+  buttonElement.classList.remove("loading");
 }
 
 /**
@@ -64,6 +79,7 @@ function refreshPanel(): void {
   // Preserve open state
   if (wasOpen) {
     newPanel.classList.add("open");
+    if (buttonElement) buttonElement.style.setProperty("display", "none", "important");
   }
 
   panelElement.replaceWith(newPanel);
@@ -168,6 +184,7 @@ export function open(): void {
   panelElement.classList.add("open");
   buttonElement.classList.add("active");
   buttonElement.setAttribute("aria-expanded", "true");
+  buttonElement.style.setProperty("display", "none", "important");
 }
 
 /**
@@ -187,6 +204,7 @@ export function reset(): void {
   if (panelElement?.classList.contains("open")) {
     const newPanel = createPanel(currentConfig);
     newPanel.classList.add("open");
+    if (buttonElement) buttonElement.style.setProperty("display", "none", "important");
     panelElement.replaceWith(newPanel);
     panelElement = newPanel;
 

@@ -81,7 +81,7 @@ export function getValue(): boolean {
 export const dyslexiaFontFeature: FeatureModule = {
   name: "dyslexiaFont",
   label: "Dyslexia Font",
-  icon: "Dy",
+  icon: "Ɐ",
   type: "toggle",
   apply,
   reset,
