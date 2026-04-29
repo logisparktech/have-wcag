@@ -17,10 +17,10 @@ const CONTRAST_CSS = `
     color: #ffffff !important;
   }
   
-  /* Aggressive global override for all elements */
+  /* Aggressive global override for all elements - using transparent background to prevent framework overlays from becoming solid opaque blocks */
   html.hwcag-high-contrast *:not(.hwcag-widget):not(.hwcag-widget *):not(.hwcag-widget-panel):not(.hwcag-widget-panel *):not(.hwcag-widget-button):not(.hwcag-toolbar):not(.hwcag-toolbar *):not(.hwcag-panel):not(.hwcag-panel *):not(#hwcag-reading-guide),
   html[data-hwcag-contrast] *:not(.hwcag-widget):not(.hwcag-widget *):not(.hwcag-widget-panel):not(.hwcag-widget-panel *):not(.hwcag-widget-button):not(.hwcag-toolbar):not(.hwcag-toolbar *):not(.hwcag-panel):not(.hwcag-panel *):not(#hwcag-reading-guide) {
-    background-color: #000000 !important;
+    background-color: transparent !important;
     color: #ffffff !important;
     border-color: #ffffff !important;
     text-shadow: none !important;

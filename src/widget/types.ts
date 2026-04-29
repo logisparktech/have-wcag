@@ -25,7 +25,9 @@ export type WidgetFeature =
   | "textAlignment"
   | "stopAnimations"
   | "pageStructure"
-  | "screenReader";
+  | "screenReader"
+  | "saturation"
+  | "grayscale";
 
 /**
  * Theme configuration for the widget
@@ -68,6 +70,8 @@ export interface WidgetState {
   stopAnimations: boolean;
   pageStructure: boolean;
   screenReader: boolean;
+  saturation: boolean;
+  grayscale: boolean;
 }
 
 /**
@@ -106,6 +110,8 @@ export const DEFAULT_CONFIG: Required<WidgetConfig> = {
     "stopAnimations",
     "pageStructure",
     "screenReader",
+    "saturation",
+    "grayscale",
   ],
   theme: {
     primaryColor: "#045fc1",
@@ -137,4 +143,6 @@ export const DEFAULT_STATE: WidgetState = {
   stopAnimations: false,
   pageStructure: false,
   screenReader: false,
+  saturation: false,
+  grayscale: false,
 };

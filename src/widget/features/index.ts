@@ -76,6 +76,16 @@ import {
   toggle as toggleScreenReader,
   getValue as getScreenReaderValue,
 } from "./screen-reader";
+import {
+  saturationFeature,
+  toggle as toggleSaturation,
+  getValue as getSaturationValue,
+} from "./saturation";
+import {
+  grayscaleFeature,
+  toggle as toggleGrayscale,
+  getValue as getGrayscaleValue,
+} from "./grayscale";
 
 import type { FeatureModule, WidgetFeature } from "../types";
 
@@ -98,6 +108,8 @@ export const features: Record<WidgetFeature, FeatureModule> = {
   stopAnimations: stopAnimationsFeature,
   pageStructure: pageStructureFeature,
   screenReader: screenReaderFeature,
+  saturation: saturationFeature,
+  grayscale: grayscaleFeature,
 };
 
 /**
@@ -182,6 +194,16 @@ export const featureActions = {
     getValue: getScreenReaderValue,
     reset: screenReaderFeature.reset,
   },
+  saturation: {
+    toggle: toggleSaturation,
+    getValue: getSaturationValue,
+    reset: saturationFeature.reset,
+  },
+  grayscale: {
+    toggle: toggleGrayscale,
+    getValue: getGrayscaleValue,
+    reset: grayscaleFeature.reset,
+  },
 };
 
 /**
@@ -209,4 +231,6 @@ export {
   stopAnimationsFeature,
   pageStructureFeature,
   screenReaderFeature,
+  saturationFeature,
+  grayscaleFeature,
 };

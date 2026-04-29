@@ -4,10 +4,10 @@ const STYLE_ID = "hwcag-screen-reader-styles";
 
 const SCREEN_READER_CSS = `
   .hwcag-sr-highlight {
-    background: #fff3a3 !important;
-    outline: 2px solid #f5d623 !important;
+    outline: 3px solid #f5d623 !important;
     outline-offset: 2px !important;
-    transition: background 0.2s ease, outline 0.2s ease !important;
+    box-shadow: 0 0 0 6px rgba(245, 214, 35, 0.3) !important;
+    transition: outline 0.2s ease, box-shadow 0.2s ease !important;
     border-radius: 3px !important;
   }
 
@@ -133,8 +133,52 @@ let readGeneration = 0; // tracks active read session to prevent stale callbacks
 const TEXT_CONTAINERS = [
   "P", "LI", "H1", "H2", "H3", "H4", "H5", "H6",
   "TD", "TH", "BLOCKQUOTE", "DD", "DT", "FIGCAPTION",
-  "LABEL", "PRE", "SUMMARY", "CAPTION"
+  "LABEL", "PRE", "SUMMARY", "CAPTION", "A", "BUTTON", "IMG"
 ];
+
+/**
+ * Compute the accessible name for an element
+ */
+function getAccessibleName(el: HTMLElement): string {
+  // 1. aria-labelledby
+  const labelledby = el.getAttribute("aria-labelledby");
+  if (labelledby) {
+    const labelEl = document.getElementById(labelledby.split(' ')[0]);
+    if (labelEl) {
+      const labelName = getAccessibleName(labelEl);
+      if (labelName) return labelName;
+    }
+  }
+
+  // 2. aria-label
+  const ariaLabel = el.getAttribute("aria-label");
+  if (ariaLabel && ariaLabel.trim()) return ariaLabel.trim();
+
+  // 3. alt text for images
+  if (el.tagName === "IMG") {
+    const alt = el.getAttribute("alt");
+    if (alt && alt.trim()) return alt.trim();
+  }
+
+  // 4. Form inputs (value, placeholder)
+  if (el.tagName === "INPUT" || el.tagName === "TEXTAREA") {
+    const input = el as HTMLInputElement;
+    if (input.value && input.value.trim()) return input.value.trim();
+    if (input.placeholder && input.placeholder.trim()) return input.placeholder.trim();
+  }
+
+  // 5. innerText (ignores hidden elements and styles/scripts)
+  if (el.innerText && el.innerText.trim()) {
+    return el.innerText.trim();
+  }
+
+  // 6. title attribute
+  const title = el.getAttribute("title");
+  if (title && title.trim()) return title.trim();
+
+  // 7. textContent as a last resort
+  return el.textContent?.trim() || "";
+}
 
 /**
  * Inject screen reader styles
@@ -153,16 +197,27 @@ function injectStyles(): void {
 function findTextBlock(el: HTMLElement): HTMLElement | null {
   let node: HTMLElement | null = el;
   // Walk up looking for a known text container
-  while (node && node !== document.body) {
+  while (node && node !== document.body && node.tagName !== "HTML" && node.tagName !== "MAIN") {
     if (node.closest(".hwcag-widget")) return null; // ignore widget elements
     if (TEXT_CONTAINERS.includes(node.tagName)) {
       return node;
     }
     node = node.parentElement;
   }
-  // Fallback: if the clicked element itself has text content, use it
-  if (el.textContent && el.textContent.trim().length > 0 && !el.closest(".hwcag-widget")) {
-    return el;
+  
+  // Fallback: if the clicked element itself has human-readable text content, or aria/input values
+  const text = getAccessibleName(el);
+  if (text && text.length > 0 && !el.closest(".hwcag-widget")) {
+    // Never read structural layout tags if clicked in empty space
+    const IGNORED = ["BODY", "MAIN", "SECTION", "ARTICLE", "ASIDE", "HEADER", "FOOTER", "NAV", "FORM", "STYLE", "SCRIPT", "NOSCRIPT", "DIALOG"];
+    if (IGNORED.includes(el.tagName)) return null;
+
+    // If the element contains known block text containers, the user likely clicked a blank gap.
+    // Reading the whole container would be too much text.
+    const hasBlockChildren = el.querySelector(TEXT_CONTAINERS.join(",")) !== null;
+    if (!hasBlockChildren) {
+      return el;
+    }
   }
   return null;
 }
@@ -200,7 +255,8 @@ function readElement(el: HTMLElement): void {
   window.speechSynthesis.cancel();
   clearHighlight();
 
-  const text = el.textContent?.trim();
+  // Compute the best accessible name (aria-labels, alt text, innerText, etc.)
+  const text = getAccessibleName(el);
   if (!text) return;
 
   // Highlight the element
@@ -249,6 +305,23 @@ function handlePageClick(e: MouseEvent): void {
   const textBlock = findTextBlock(target);
   if (textBlock) {
     e.preventDefault();
+    readElement(textBlock);
+  }
+}
+
+/**
+ * Handle focus/tabbing on the page
+ */
+function handleFocus(e: FocusEvent): void {
+  if (!isEnabled) return;
+
+  const target = e.target as HTMLElement;
+
+  // Ignore focus on the widget and control bar
+  if (!target || target.closest(".hwcag-widget") || target.closest(".hwcag-sr-controls")) return;
+
+  const textBlock = findTextBlock(target);
+  if (textBlock) {
     readElement(textBlock);
   }
 }
@@ -396,6 +469,7 @@ function apply(enabled: boolean): void {
       return;
     }
     document.addEventListener("click", handlePageClick, true);
+    document.addEventListener("focusin", handleFocus, true);
     window.addEventListener("beforeunload", handleBeforeUnload);
     // Create control bar
     controlBar = createControlBar();
@@ -403,6 +477,7 @@ function apply(enabled: boolean): void {
     showHint();
   } else {
     document.removeEventListener("click", handlePageClick, true);
+    document.removeEventListener("focusin", handleFocus, true);
     window.removeEventListener("beforeunload", handleBeforeUnload);
     stopSpeech();
     // Remove control bar
