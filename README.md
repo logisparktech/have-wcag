@@ -355,7 +355,6 @@ export default {
       position: "bottom-right",
       ...options.widget,
     });
-
   },
 };
 ```
