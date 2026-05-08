@@ -13,7 +13,16 @@ const plugins = (outDir = "dist") => [
     tsconfig: "./tsconfig.json",
     declarationDir: outDir + "/types",
   }),
-  production && terser(),
+  production && terser({
+    compress: {
+      passes: 2,           // Tells Terser to double-check code for optimizations
+      drop_console: true,  // Removes ALL console.logs in production
+      drop_debugger: true  // Removes debugger statements
+    },
+    format: {
+      comments: false // strips out comments
+    }
+  }),
 ];
 
 export default [
