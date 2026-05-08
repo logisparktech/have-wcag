@@ -2,6 +2,7 @@ import resolve from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import typescript from "@rollup/plugin-typescript";
 import terser from "@rollup/plugin-terser";
+import babel from "@rollup/plugin-babel";
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -12,6 +13,19 @@ const plugins = (outDir = "dist") => [
   typescript({
     tsconfig: "./tsconfig.json",
     declarationDir: outDir + "/types",
+  }),
+  babel({
+    babelHelpers: 'bundled',
+    exclude: 'node_modules/**',
+    extensions: ['.ts', '.js'],
+    presets: [
+      ['@babel/preset-env', {
+        targets: {
+          node: "14",
+          browsers: ["> 0.25%", "not dead", "ie 11"]
+        }
+      }]
+    ]
   }),
   production && terser({
     compress: {
