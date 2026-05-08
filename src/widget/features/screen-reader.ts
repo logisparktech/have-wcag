@@ -56,13 +56,13 @@ const SCREEN_READER_CSS = `
 
   .hwcag-sr-status {
     font-size: 12px !important;
-    color: #94a3b8 !important;
+    color: white !important;
     min-width: 90px !important;
     text-align: center !important;
     white-space: nowrap !important;
   }
   .hwcag-sr-status.reading {
-    color: #38bdf8 !important;
+    color: white !important;
   }
 
   .hwcag-sr-speed {
@@ -93,7 +93,7 @@ const SCREEN_READER_CSS = `
     transform: translateX(-50%) !important;
     z-index: 1000001 !important;
     background: #1e293b !important;
-    color: #94a3b8 !important;
+    color: white !important;
     border-radius: 10px !important;
     padding: 8px 16px !important;
     font-size: 12px !important;
@@ -266,7 +266,26 @@ function readElement(el: HTMLElement): void {
   // Create speech utterance
   const utterance = new SpeechSynthesisUtterance(text);
   utterance.rate = speechRate;
-  utterance.lang = document.documentElement.lang || "en";
+
+  if(/[\u0900-\u097F]/.test(text)) {
+    const voices = window.speechSynthesis.getVoices();
+    let devanagariVoice = voices.find(v => v.lang.includes('ne'));
+    if (!devanagariVoice) {
+      devanagariVoice = voices.find(v => v.lang.includes('hi'));
+    }
+    if (devanagariVoice) {
+      utterance.lang = devanagariVoice.lang;
+      utterance.voice = devanagariVoice;
+    } else {
+      console.warn("No Devanagari voice found on this device.");
+      updateControlBarStatus('Devanagari scripts not supported on this browser!');
+      const notFoundUtterance = new SpeechSynthesisUtterance('Devanagari scripts not supported on this browser!');
+      window.speechSynthesis.speak(notFoundUtterance);
+      return;
+    }
+  } else {
+    utterance.lang = document.documentElement.lang || "en";
+  }
 
   utterance.onstart = () => {
     isPaused = false;
