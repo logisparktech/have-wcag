@@ -180,6 +180,10 @@ export function init(config: WidgetConfig = {}): void {
 
   currentConfig = { ...DEFAULT_CONFIG, ...config };
 
+  // Load any previously saved state before creating the panel so the UI
+  // reflects persisted values from the start (getValue() is read at creation time).
+  loadState();
+
   // Create UI elements
   buttonElement = createButton(currentConfig);
   panelElement = createPanel(currentConfig);
@@ -191,9 +195,6 @@ export function init(config: WidgetConfig = {}): void {
   if (closeBtn) {
     closeBtn.addEventListener("click", closePanel);
   }
-
-  // Load any previously saved state
-  loadState();
 
   document.addEventListener("click", handleClickOutside);
   document.addEventListener("keydown", handleEscapeKey);
