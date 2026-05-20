@@ -615,12 +615,13 @@ export function createPanel(config: WidgetConfig): HTMLElement {
   const theme = { ...DEFAULT_CONFIG.theme, ...config.theme };
 
   const styleId = "hwcag-widget-panel-styles";
-  if (!document.getElementById(styleId)) {
-    const style = document.createElement("style");
-    style.id = styleId;
-    style.textContent = getPanelStyles(settings.position);
-    document.head.appendChild(style);
+  let panelStyle = document.getElementById(styleId) as HTMLStyleElement | null;
+  if (!panelStyle) {
+    panelStyle = document.createElement("style") as HTMLStyleElement;
+    panelStyle.id = styleId;
+    document.head.appendChild(panelStyle);
   }
+  panelStyle.textContent = getPanelStyles(settings.position);
 
   const panel = document.createElement("div");
   panel.className = "hwcag-widget hwcag-widget-panel";

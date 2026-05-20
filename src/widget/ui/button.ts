@@ -12,12 +12,12 @@ function getThemeCSS(theme: WidgetTheme): string {
   `;
 }
 
-function getPositionStyles(position: string): string {
-  const positions: Record<string, string> = {
-    "bottom-right": "bottom: 24px; right: 24px;",
-    "bottom-left": "bottom: 24px; left: 24px;",
-    "top-right": "top: 24px; right: 24px;",
-    "top-left": "top: 24px; left: 24px;",
+function getPositionValues(position: string): Record<string, string> {
+  const positions: Record<string, Record<string, string>> = {
+    "bottom-right": { bottom: "24px", right: "24px" },
+    "bottom-left": { bottom: "24px", left: "24px" },
+    "top-right": { top: "24px", right: "24px" },
+    "top-left": { top: "24px", left: "24px" },
   };
   return positions[position] || positions["bottom-right"];
 }
@@ -154,7 +154,11 @@ export function createButton(config: WidgetConfig): HTMLElement {
   button.className = "hwcag-widget hwcag-widget-button";
   button.title = 'Accessibility Settings';
   button.ariaLabel = 'Accessibility Settings';
-  button.style.cssText = getThemeCSS(theme) + getPositionStyles(settings.position);
+  button.style.cssText = getThemeCSS(theme);
+  const posValues = getPositionValues(settings.position);
+  Object.entries(posValues).forEach(([prop, val]) => {
+    button.style.setProperty(prop, val, "important");
+  });
   button.innerHTML = ACCESSIBILITY_ICON;
   button.setAttribute("aria-label", settings.buttonLabel);
   button.setAttribute("aria-expanded", "false");
