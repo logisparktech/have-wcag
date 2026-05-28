@@ -126,12 +126,12 @@ export function getPanelStyles(position: string): string {
       line-height: 1;
       padding: 0;
     }
-    .hwcag-panel-close {
-      font-size: 20px;
-    }
     .hwcag-panel-move svg,
     .hwcag-panel-close svg {
       pointer-events: none;
+      width: 18px;
+      height: 18px;
+      fill: white;
     }
     .hwcag-panel-move:hover,
     .hwcag-panel-close:hover {
@@ -734,7 +734,7 @@ export function createPanel(
 
   const closeBtn = document.createElement("button");
   closeBtn.className = "hwcag-panel-close";
-  closeBtn.innerHTML = "&times;";
+  closeBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/></svg>`;
   closeBtn.setAttribute("aria-label", "Close accessibility menu");
 
   header.appendChild(headerIconWrap);

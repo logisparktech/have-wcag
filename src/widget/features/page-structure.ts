@@ -48,6 +48,7 @@ const PAGE_STRUCTURE_CSS = `
     font-weight: 700 !important;
     margin: 0 !important;
     letter-spacing: -0.01em !important;
+    color: white !important;
   }
   .hwcag-ps-close {
     background: rgba(255, 255, 255, 0.15) !important;
@@ -57,13 +58,18 @@ const PAGE_STRUCTURE_CSS = `
     height: 34px !important;
     border-radius: 9px !important;
     cursor: pointer !important;
-    font-size: 20px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     transition: background 0.15s !important;
     flex-shrink: 0 !important;
-    line-height: 1 !important;
+    padding: 0 !important;
+  }
+  .hwcag-ps-close svg {
+    width: 20px !important;
+    height: 20px !important;
+    fill: white !important;
+    pointer-events: none !important;
   }
   .hwcag-ps-close:hover {
     background: rgba(255, 255, 255, 0.28) !important;
@@ -87,8 +93,11 @@ const PAGE_STRUCTURE_CSS = `
     cursor: pointer !important;
     border-bottom: 2px solid transparent !important;
     transition: color 0.15s, border-color 0.15s !important;
-    font-family: inherit !important;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
     white-space: nowrap !important;
+    line-height: normal !important;
+    text-transform: none !important;
+    letter-spacing: normal !important;
   }
   .hwcag-ps-tab:hover {
     color: #045fc1 !important;
@@ -435,7 +444,7 @@ function openModal(): void {
 
   const closeBtn = document.createElement("button");
   closeBtn.className = "hwcag-ps-close";
-  closeBtn.innerHTML = "&times;";
+  closeBtn.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z"/></svg>`;
   closeBtn.setAttribute("aria-label", "Close page structure");
   closeBtn.addEventListener("click", closeModal);
 
