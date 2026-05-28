@@ -1,23 +1,15 @@
 import type { FeatureModule } from "../types";
+import { setFilter, clearFilter } from "./filter-manager";
 
+const FILTER_KEY = "darkMode";
 const STYLE_ID = "hwcag-dark-mode-styles";
 
-/**
- * Dark Mode CSS - applies a pleasant dark theme
- * Uses CSS custom properties for smooth theme application
- */
+// Only the background + image double-invert; main element filter handled by filter-manager
 const DARK_MODE_CSS = `
-  /* Ensure the HTML background is dark so edges and scrollbars look right */
   html.hwcag-dark-mode {
     background-color: #121212 !important;
   }
-  
-  /* Apply dark mode filter to all body children except the widget and overlays */
-  html.hwcag-dark-mode body > *:not(.hwcag-widget):not(.hwcag-ps-overlay):not(.hwcag-sr-controls):not(.hwcag-sr-hint):not(.hwcag-toolbar) {
-    filter: invert(1) hue-rotate(180deg) brightness(0.95) !important;
-  }
-  
-  /* Double invert for images and media to preserve original colors */
+  /* Double invert images/media so they keep their original colours */
   html.hwcag-dark-mode body > *:not(.hwcag-widget) img,
   html.hwcag-dark-mode body > *:not(.hwcag-widget) video,
   html.hwcag-dark-mode body > *:not(.hwcag-widget) iframe,
@@ -29,51 +21,36 @@ const DARK_MODE_CSS = `
 
 let isEnabled = false;
 
-/**
- * Inject dark mode styles
- */
 function injectStyles(): void {
   if (document.getElementById(STYLE_ID)) return;
-
   const style = document.createElement("style");
   style.id = STYLE_ID;
   style.textContent = DARK_MODE_CSS;
   document.head.appendChild(style);
 }
 
-/**
- * Apply dark mode
- */
 function apply(enabled: boolean): void {
   isEnabled = enabled;
   injectStyles();
 
   if (enabled) {
     document.documentElement.classList.add("hwcag-dark-mode");
+    setFilter(FILTER_KEY, "invert(1) hue-rotate(180deg) brightness(0.95)");
   } else {
     document.documentElement.classList.remove("hwcag-dark-mode");
+    clearFilter(FILTER_KEY);
   }
 }
 
-/**
- * Reset to default
- */
 function reset(): void {
-  isEnabled = false;
-  document.documentElement.classList.remove("hwcag-dark-mode");
+  apply(false);
 }
 
-/**
- * Toggle dark mode
- */
 export function toggle(): boolean {
   apply(!isEnabled);
   return isEnabled;
 }
 
-/**
- * Get current state
- */
 export function getValue(): boolean {
   return isEnabled;
 }

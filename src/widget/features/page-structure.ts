@@ -600,6 +600,7 @@ export const pageStructureFeature: FeatureModule = {
   label: "Page Structure",
   icon: LAYERS_SVG,
   type: "toggle",
+  transient: true,
   apply,
   reset,
 };

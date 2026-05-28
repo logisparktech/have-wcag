@@ -17,10 +17,11 @@ const CONTRAST_CSS = `
     color: #ffffff !important;
   }
   
-  /* Aggressive global override for all elements - using transparent background to prevent framework overlays from becoming solid opaque blocks */
+  /* Aggressive global override for all elements - explicit black background required so sticky/fixed
+     elements don't bleed through scrolling content */
   html.hwcag-high-contrast *:not(.hwcag-widget):not(.hwcag-widget *):not(.hwcag-widget-panel):not(.hwcag-widget-panel *):not(.hwcag-widget-button):not(.hwcag-toolbar):not(.hwcag-toolbar *):not(.hwcag-panel):not(.hwcag-panel *):not(#hwcag-reading-guide),
   html[data-hwcag-contrast] *:not(.hwcag-widget):not(.hwcag-widget *):not(.hwcag-widget-panel):not(.hwcag-widget-panel *):not(.hwcag-widget-button):not(.hwcag-toolbar):not(.hwcag-toolbar *):not(.hwcag-panel):not(.hwcag-panel *):not(#hwcag-reading-guide) {
-    background-color: transparent !important;
+    background-color: #000000 !important;
     color: #ffffff !important;
     border-color: #ffffff !important;
     text-shadow: none !important;
@@ -75,6 +76,20 @@ const CONTRAST_CSS = `
     outline-offset: 2px !important;
   }
   
+  /* Dialogs and modals - outline to distinguish from black background */
+  html.hwcag-high-contrast dialog:not(.hwcag-widget *),
+  html.hwcag-high-contrast [role="dialog"]:not(.hwcag-widget *),
+  html.hwcag-high-contrast [role="alertdialog"]:not(.hwcag-widget *),
+  html.hwcag-high-contrast [aria-modal="true"]:not(.hwcag-widget *),
+  html[data-hwcag-contrast] dialog:not(.hwcag-widget *),
+  html[data-hwcag-contrast] [role="dialog"]:not(.hwcag-widget *),
+  html[data-hwcag-contrast] [role="alertdialog"]:not(.hwcag-widget *),
+  html[data-hwcag-contrast] [aria-modal="true"]:not(.hwcag-widget *) {
+    outline: 3px solid #ffffff !important;
+    outline-offset: 0px !important;
+    box-shadow: none !important;
+  }
+
   /* Images - high contrast enhancement */
   html.hwcag-high-contrast img:not(.hwcag-widget):not(.hwcag-widget *),
   html[data-hwcag-contrast] img:not(.hwcag-widget):not(.hwcag-widget *) {

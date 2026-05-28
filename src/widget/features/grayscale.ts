@@ -1,39 +1,23 @@
 import type { FeatureModule } from "../types";
+import { setFilter, clearFilter } from "./filter-manager";
 
-const STYLE_ID = "hwcag-grayscale-styles";
-
-const GRAYSCALE_CSS = `
-  /* Apply grayscale to all page content, but exclude the widget and its overlays */
-  html.hwcag-grayscale body > *:not(.hwcag-widget):not(.hwcag-ps-overlay):not(.hwcag-sr-controls):not(.hwcag-sr-hint):not(.hwcag-toolbar) {
-    filter: grayscale(100%) !important;
-  }
-`;
+const FILTER_KEY = "grayscale";
 
 let isEnabled = false;
 
-function injectStyles(): void {
-  if (document.getElementById(STYLE_ID)) return;
-
-  const style = document.createElement("style");
-  style.id = STYLE_ID;
-  style.textContent = GRAYSCALE_CSS;
-  document.head.appendChild(style);
-}
-
 function apply(enabled: boolean): void {
   isEnabled = enabled;
-  injectStyles();
-
   if (enabled) {
     document.documentElement.classList.add("hwcag-grayscale");
+    setFilter(FILTER_KEY, "grayscale(100%)");
   } else {
     document.documentElement.classList.remove("hwcag-grayscale");
+    clearFilter(FILTER_KEY);
   }
 }
 
 function reset(): void {
-  isEnabled = false;
-  document.documentElement.classList.remove("hwcag-grayscale");
+  apply(false);
 }
 
 export function toggle(): boolean {

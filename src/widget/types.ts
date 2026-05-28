@@ -82,6 +82,7 @@ export interface FeatureModule {
   label: string;
   icon: string;
   type: "toggle" | "stepper" | "select";
+  transient?: boolean; // if true, state is never saved to or restored from localStorage
   options?: string[]; // For 'select' type
   optionLabels?: Record<string, string>; // Display labels for options
   optionIcons?: Record<string, string>; // Display icons for options

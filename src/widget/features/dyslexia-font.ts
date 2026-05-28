@@ -2,7 +2,6 @@ import type { FeatureModule } from "../types";
 
 const STYLE_ID = "hwcag-dyslexia-font-styles";
 
-// Using OpenDyslexic font from CDN
 const DYSLEXIA_CSS = `
   @font-face {
     font-family: 'OpenDyslexic';
@@ -16,11 +15,61 @@ const DYSLEXIA_CSS = `
     font-weight: bold;
     font-style: normal;
   }
-  html.hwcag-dyslexia-font,
+
+  /* Apply OpenDyslexic to all elements */
   html.hwcag-dyslexia-font * {
     font-family: 'OpenDyslexic', sans-serif !important;
   }
-  /* Preserve widget font */
+
+  /*
+   * Restore icon-font elements — revert removes our !important so the
+   * component's own font-family rule (Material Icons, MDI, FA, etc.) applies.
+   */
+  html.hwcag-dyslexia-font .material-icons,
+  html.hwcag-dyslexia-font .material-icons-outlined,
+  html.hwcag-dyslexia-font .material-icons-round,
+  html.hwcag-dyslexia-font .material-icons-sharp,
+  html.hwcag-dyslexia-font .material-icons-two-tone,
+  html.hwcag-dyslexia-font .material-symbols-outlined,
+  html.hwcag-dyslexia-font .material-symbols-rounded,
+  html.hwcag-dyslexia-font .material-symbols-sharp,
+  html.hwcag-dyslexia-font .mdi,
+  html.hwcag-dyslexia-font [class^="mdi-"],
+  html.hwcag-dyslexia-font [class*=" mdi-"],
+  html.hwcag-dyslexia-font .v-icon,
+  html.hwcag-dyslexia-font .q-icon,
+  html.hwcag-dyslexia-font .fa,
+  html.hwcag-dyslexia-font .fas,
+  html.hwcag-dyslexia-font .far,
+  html.hwcag-dyslexia-font .fal,
+  html.hwcag-dyslexia-font .fab,
+  html.hwcag-dyslexia-font .fad,
+  html.hwcag-dyslexia-font .fa-solid,
+  html.hwcag-dyslexia-font .fa-regular,
+  html.hwcag-dyslexia-font .fa-light,
+  html.hwcag-dyslexia-font .fa-thin,
+  html.hwcag-dyslexia-font .fa-brands,
+  html.hwcag-dyslexia-font .bi,
+  html.hwcag-dyslexia-font ion-icon {
+    font-family: revert !important;
+  }
+
+  /* Children of icon containers inherit the reverted (icon) font */
+  html.hwcag-dyslexia-font .material-icons *,
+  html.hwcag-dyslexia-font .material-icons-outlined *,
+  html.hwcag-dyslexia-font .material-symbols-outlined *,
+  html.hwcag-dyslexia-font .mdi *,
+  html.hwcag-dyslexia-font [class^="mdi-"] *,
+  html.hwcag-dyslexia-font .v-icon *,
+  html.hwcag-dyslexia-font .q-icon *,
+  html.hwcag-dyslexia-font .fa *,
+  html.hwcag-dyslexia-font .fas *,
+  html.hwcag-dyslexia-font .far *,
+  html.hwcag-dyslexia-font .fab * {
+    font-family: inherit !important;
+  }
+
+  /* Preserve the accessibility widget's own font */
   html.hwcag-dyslexia-font .hwcag-widget,
   html.hwcag-dyslexia-font .hwcag-widget * {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
@@ -29,21 +78,14 @@ const DYSLEXIA_CSS = `
 
 let isEnabled = false;
 
-/**
- * Inject dyslexia font styles
- */
 function injectStyles(): void {
   if (document.getElementById(STYLE_ID)) return;
-
   const style = document.createElement("style");
   style.id = STYLE_ID;
   style.textContent = DYSLEXIA_CSS;
   document.head.appendChild(style);
 }
 
-/**
- * Apply dyslexia font
- */
 function apply(enabled: boolean): void {
   isEnabled = enabled;
   injectStyles();
@@ -55,25 +97,15 @@ function apply(enabled: boolean): void {
   }
 }
 
-/**
- * Reset to default
- */
 function reset(): void {
-  isEnabled = false;
-  document.documentElement.classList.remove("hwcag-dyslexia-font");
+  apply(false);
 }
 
-/**
- * Toggle dyslexia font
- */
 export function toggle(): boolean {
   apply(!isEnabled);
   return isEnabled;
 }
 
-/**
- * Get current state
- */
 export function getValue(): boolean {
   return isEnabled;
 }

@@ -1,39 +1,23 @@
 import type { FeatureModule } from "../types";
+import { setFilter, clearFilter } from "./filter-manager";
 
-const STYLE_ID = "hwcag-saturation-styles";
-
-const SATURATION_CSS = `
-  /* Apply saturation to all page content, but exclude the widget and its overlays */
-  html.hwcag-saturation body > *:not(.hwcag-widget):not(.hwcag-ps-overlay):not(.hwcag-sr-controls):not(.hwcag-sr-hint):not(.hwcag-toolbar) {
-    filter: saturate(200%) !important;
-  }
-`;
+const FILTER_KEY = "saturation";
 
 let isEnabled = false;
 
-function injectStyles(): void {
-  if (document.getElementById(STYLE_ID)) return;
-
-  const style = document.createElement("style");
-  style.id = STYLE_ID;
-  style.textContent = SATURATION_CSS;
-  document.head.appendChild(style);
-}
-
 function apply(enabled: boolean): void {
   isEnabled = enabled;
-  injectStyles();
-
   if (enabled) {
     document.documentElement.classList.add("hwcag-saturation");
+    setFilter(FILTER_KEY, "saturate(200%)");
   } else {
     document.documentElement.classList.remove("hwcag-saturation");
+    clearFilter(FILTER_KEY);
   }
 }
 
 function reset(): void {
-  isEnabled = false;
-  document.documentElement.classList.remove("hwcag-saturation");
+  apply(false);
 }
 
 export function toggle(): boolean {
