@@ -17,13 +17,13 @@ const CONTRAST_CSS = `
     color: #ffffff !important;
   }
   
-  /* Aggressive global override for all elements - explicit black background required so sticky/fixed
-     elements don't bleed through scrolling content */
+  /* Aggressive global override for all elements */
   html.hwcag-high-contrast *:not(.hwcag-widget):not(.hwcag-widget *):not(.hwcag-widget-panel):not(.hwcag-widget-panel *):not(.hwcag-widget-button):not(.hwcag-toolbar):not(.hwcag-toolbar *):not(.hwcag-panel):not(.hwcag-panel *):not(#hwcag-reading-guide),
   html[data-hwcag-contrast] *:not(.hwcag-widget):not(.hwcag-widget *):not(.hwcag-widget-panel):not(.hwcag-widget-panel *):not(.hwcag-widget-button):not(.hwcag-toolbar):not(.hwcag-toolbar *):not(.hwcag-panel):not(.hwcag-panel *):not(#hwcag-reading-guide) {
-    background-color: #000000 !important;
+    background-color: transparent !important;
     color: #ffffff !important;
     border-color: #ffffff !important;
+    outline: 1px solid rgba(255,255,255,0.15) !important;
     text-shadow: none !important;
     box-shadow: none !important;
   }
