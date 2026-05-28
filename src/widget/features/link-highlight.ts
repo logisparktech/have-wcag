@@ -6,12 +6,10 @@ const LINK_HIGHLIGHT_CSS = `
   html.hwcag-link-highlight a:not(.hwcag-widget a) {
     outline: 2px solid #007bff !important;
     outline-offset: 2px !important;
-    background-color: rgba(0, 123, 255, 0.1) !important;
     text-decoration: underline !important;
   }
   html.hwcag-link-highlight a:not(.hwcag-widget a):hover {
     outline-color: #0056b3 !important;
-    background-color: rgba(0, 123, 255, 0.2) !important;
   }
   html.hwcag-link-highlight a:not(.hwcag-widget a):focus {
     outline-width: 3px !important;

@@ -56,7 +56,7 @@ export interface WidgetConfig {
  */
 export interface WidgetState {
   textSize: number; // 0 = default, positive = larger, negative = smaller
-  contrast: boolean; // high contrast mode
+  contrast: string; // "off" | "dark" | "light"
   darkMode: boolean; // dark mode
   dyslexiaFont: boolean; // dyslexia-friendly font
   lineHeight: number; // 0 = default, positive = larger, negative = smaller
@@ -130,7 +130,7 @@ export const DEFAULT_CONFIG: Required<WidgetConfig> = {
  */
 export const DEFAULT_STATE: WidgetState = {
   textSize: 0,
-  contrast: false,
+  contrast: "off",
   darkMode: false,
   dyslexiaFont: false,
   lineHeight: 0,

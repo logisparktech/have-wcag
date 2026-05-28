@@ -323,7 +323,11 @@ function handlePageClick(e: MouseEvent): void {
 
   const textBlock = findTextBlock(target);
   if (textBlock) {
-    e.preventDefault();
+    // Don't block native actions on interactive elements (links, buttons, inputs)
+    const isInteractive = !!target.closest('a, button, input, select, textarea, [role="button"], [role="link"]');
+    if (!isInteractive) {
+      e.preventDefault();
+    }
     readElement(textBlock);
   }
 }

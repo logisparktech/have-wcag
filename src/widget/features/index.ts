@@ -6,7 +6,7 @@ import {
 } from "./text-size";
 import {
   contrastFeature,
-  toggle as toggleContrast,
+  cycle as cycleContrast,
   getValue as getContrastValue,
 } from "./contrast";
 import {
@@ -123,7 +123,7 @@ export const featureActions = {
     reset: textSizeFeature.reset,
   },
   contrast: {
-    toggle: toggleContrast,
+    cycle: cycleContrast,
     getValue: getContrastValue,
     reset: contrastFeature.reset,
   },

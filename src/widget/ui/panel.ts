@@ -459,6 +459,7 @@ function createToggleCard(
   card.appendChild(toggle.el);
 
   card.addEventListener("click", () => {
+
     onChange();
     const isActive = card.classList.toggle("active");
     card.setAttribute("aria-checked", String(isActive));
@@ -508,6 +509,7 @@ function createStepperCard(
   card.appendChild(dots.el);
 
   card.addEventListener("click", () => {
+
     if (currentLevel >= numLevels - 1) {
       onReset();
       currentLevel = 0;
@@ -572,6 +574,7 @@ function createSelectCard(
   card.appendChild(dots.el);
 
   card.addEventListener("click", () => {
+
     onCycle();
     currentIndex = getIndex();
     const newOption = options[currentIndex];
@@ -760,6 +763,7 @@ export function createPanel(
   resetBtn.className = "hwcag-reset-btn";
   resetBtn.innerHTML = `${RESET_ICON} Reset Settings`;
   resetBtn.addEventListener("click", () => {
+
     resetAll();
     document.dispatchEvent(new CustomEvent("hwcag:reset"));
   });
