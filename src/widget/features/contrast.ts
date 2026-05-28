@@ -14,26 +14,31 @@ const CONTRAST_CSS = `
   html[data-hwcag-contrast],
   html[data-hwcag-contrast] body {
     background-color: #000000 !important;
-    color: #ffffff !important;
+    color: #50d0a0 !important;
   }
   
   /* Aggressive global override for all elements */
   html.hwcag-high-contrast *:not(.hwcag-widget):not(.hwcag-widget *):not(.hwcag-widget-panel):not(.hwcag-widget-panel *):not(.hwcag-widget-button):not(.hwcag-toolbar):not(.hwcag-toolbar *):not(.hwcag-panel):not(.hwcag-panel *):not(#hwcag-reading-guide),
   html[data-hwcag-contrast] *:not(.hwcag-widget):not(.hwcag-widget *):not(.hwcag-widget-panel):not(.hwcag-widget-panel *):not(.hwcag-widget-button):not(.hwcag-toolbar):not(.hwcag-toolbar *):not(.hwcag-panel):not(.hwcag-panel *):not(#hwcag-reading-guide) {
     background-color: transparent !important;
-    color: #ffffff !important;
-    border-color: #ffffff !important;
+    color: #50d0a0 !important;
+    border-color: #50d0a0 !important;
     outline: 1px solid rgba(255,255,255,0.15) !important;
     text-shadow: none !important;
     box-shadow: none !important;
   }
   
-  /* Links - Yellow for high visibility */
-  html.hwcag-high-contrast a:not(.hwcag-widget):not(.hwcag-widget *),
-  html[data-hwcag-contrast] a:not(.hwcag-widget):not(.hwcag-widget *) {
-    color: #ffff00 !important;
+  /* Links — must match the full :not() chain of the global * rule to win on specificity */
+  html.hwcag-high-contrast a:not(.hwcag-widget):not(.hwcag-widget *):not(.hwcag-widget-panel):not(.hwcag-widget-panel *):not(.hwcag-widget-button):not(.hwcag-toolbar):not(.hwcag-toolbar *):not(.hwcag-panel):not(.hwcag-panel *):not(#hwcag-reading-guide),
+  html[data-hwcag-contrast] a:not(.hwcag-widget):not(.hwcag-widget *):not(.hwcag-widget-panel):not(.hwcag-widget-panel *):not(.hwcag-widget-button):not(.hwcag-toolbar):not(.hwcag-toolbar *):not(.hwcag-panel):not(.hwcag-panel *):not(#hwcag-reading-guide) {
+    color: #fcff3c !important;
     text-decoration: underline !important;
     font-weight: bold !important;
+  }
+
+  html.hwcag-high-contrast a:not(.hwcag-widget):not(.hwcag-widget *):not(.hwcag-widget-panel):not(.hwcag-widget-panel *):not(.hwcag-widget-button):not(.hwcag-toolbar):not(.hwcag-toolbar *):not(.hwcag-panel):not(.hwcag-panel *):not(#hwcag-reading-guide) *,
+  html[data-hwcag-contrast] a:not(.hwcag-widget):not(.hwcag-widget *):not(.hwcag-widget-panel):not(.hwcag-widget-panel *):not(.hwcag-widget-button):not(.hwcag-toolbar):not(.hwcag-toolbar *):not(.hwcag-panel):not(.hwcag-panel *):not(#hwcag-reading-guide) * {
+    color: #fcff3c !important;
   }
   
   html.hwcag-high-contrast a:hover:not(.hwcag-widget):not(.hwcag-widget *),
@@ -50,29 +55,29 @@ const CONTRAST_CSS = `
   html[data-hwcag-contrast] textarea:not(.hwcag-widget):not(.hwcag-widget *),
   html[data-hwcag-contrast] select:not(.hwcag-widget):not(.hwcag-widget *) {
     background-color: #000000 !important;
-    color: #ffffff !important;
-    border: 3px solid #ffffff !important;
+    color: #50d0a0 !important;
+    border: 3px solid #50d0a0 !important;
   }
   
   /* Buttons */
   html.hwcag-high-contrast button:not(.hwcag-widget):not(.hwcag-widget *),
   html[data-hwcag-contrast] button:not(.hwcag-widget):not(.hwcag-widget *) {
-    background-color: #ffffff !important;
+    background-color: #50d0a0 !important;
     color: #000000 !important;
-    border: 3px solid #ffffff !important;
+    border: 3px solid #50d0a0 !important;
     font-weight: bold !important;
   }
   
   html.hwcag-high-contrast button:hover:not(.hwcag-widget):not(.hwcag-widget *),
   html[data-hwcag-contrast] button:hover:not(.hwcag-widget):not(.hwcag-widget *) {
-    background-color: #ffff00 !important;
+    background-color: #fcff3c !important;
     color: #000000 !important;
   }
   
   /* Focus indicators */
   html.hwcag-high-contrast *:focus:not(.hwcag-widget):not(.hwcag-widget *),
   html[data-hwcag-contrast] *:focus:not(.hwcag-widget):not(.hwcag-widget *) {
-    outline: 4px solid #ffff00 !important;
+    outline: 4px solid #fcff3c !important;
     outline-offset: 2px !important;
   }
   
@@ -85,7 +90,7 @@ const CONTRAST_CSS = `
   html[data-hwcag-contrast] [role="dialog"]:not(.hwcag-widget *),
   html[data-hwcag-contrast] [role="alertdialog"]:not(.hwcag-widget *),
   html[data-hwcag-contrast] [aria-modal="true"]:not(.hwcag-widget *) {
-    outline: 3px solid #ffffff !important;
+    outline: 3px solid #50d0a0 !important;
     outline-offset: 0px !important;
     box-shadow: none !important;
   }
@@ -94,7 +99,7 @@ const CONTRAST_CSS = `
   html.hwcag-high-contrast img:not(.hwcag-widget):not(.hwcag-widget *),
   html[data-hwcag-contrast] img:not(.hwcag-widget):not(.hwcag-widget *) {
     filter: contrast(1.5) grayscale(1) !important;
-    border: 2px solid #ffffff !important;
+    border: 2px solid #50d0a0 !important;
   }
 `;
 
