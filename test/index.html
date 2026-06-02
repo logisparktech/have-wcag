@@ -371,6 +371,90 @@
         </p>
       </section>
 
+      <!-- SCREEN READER INPUT TESTING -->
+      <section id="sr-inputs">
+        <h2>Screen Reader — Input Field Tests</h2>
+        <p>Enable the Screen Reader feature, then tab through or click into each field. Each field should announce its label and placeholder. Typing should speak each character aloud (password field says "password" per keystroke).</p>
+
+        <style>
+          .sr-form { display: grid; gap: 20px; max-width: 480px; margin-top: 20px; }
+          .sr-form label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 500; color: #333; }
+          .sr-form input, .sr-form textarea, .sr-form select {
+            padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 6px;
+            font-size: 14px; font-family: inherit; outline-offset: 2px;
+          }
+          .sr-form input:focus, .sr-form textarea:focus, .sr-form select:focus {
+            outline: 2px solid #3b82f6; border-color: transparent;
+          }
+          .sr-form .hint { font-size: 12px; color: #64748b; font-weight: 400; }
+          .sr-form fieldset { border: 1px solid #e2e8f0; border-radius: 6px; padding: 16px; }
+          .sr-form legend { font-size: 13px; font-weight: 600; color: #475569; padding: 0 6px; }
+          .sr-form .radio-group { display: flex; flex-direction: column; gap: 8px; }
+          .sr-form .radio-group label { flex-direction: row; align-items: center; gap: 8px; font-weight: 400; }
+        </style>
+
+        <form class="sr-form" onsubmit="return false">
+
+          <!-- Label via <label for> -->
+          <label for="sr-name">
+            Full Name
+            <input id="sr-name" type="text" placeholder="e.g. Jane Smith" autocomplete="off" />
+            <span class="hint">Label linked via &lt;label for&gt;</span>
+          </label>
+
+          <!-- Label via aria-label, no visible label -->
+          <div>
+            <input
+              type="email"
+              aria-label="Email address"
+              placeholder="you@example.com"
+              autocomplete="off"
+              style="width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;"
+            />
+            <span class="hint" style="font-size:12px;color:#64748b;display:block;margin-top:4px;">Label via <code>aria-label</code> only (no visible label element)</span>
+          </div>
+
+          <!-- Label via aria-labelledby -->
+          <div>
+            <span id="phone-label" style="font-size:14px;font-weight:500;color:#333;display:block;margin-bottom:6px;">Phone Number</span>
+            <input
+              type="tel"
+              aria-labelledby="phone-label"
+              placeholder="+1 (555) 000-0000"
+              autocomplete="off"
+              style="width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;"
+            />
+            <span class="hint" style="font-size:12px;color:#64748b;display:block;margin-top:4px;">Label via <code>aria-labelledby</code></span>
+          </div>
+
+          <!-- Password field -->
+          <label for="sr-password">
+            Password
+            <input id="sr-password" type="password" placeholder="Min 8 characters" autocomplete="new-password" />
+            <span class="hint">Every keystroke should say "password"</span>
+          </label>
+
+          <!-- Textarea -->
+          <label for="sr-bio">
+            Bio
+            <textarea id="sr-bio" rows="3" placeholder="Tell us a little about yourself…"></textarea>
+            <span class="hint">Textarea — should announce label + placeholder on focus</span>
+          </label>
+
+          <!-- No label, no aria — fallback to placeholder only -->
+          <div>
+            <input
+              type="search"
+              placeholder="Search articles…"
+              autocomplete="off"
+              style="width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;"
+            />
+            <span class="hint" style="font-size:12px;color:#64748b;display:block;margin-top:4px;">No label — fallback to placeholder text only</span>
+          </div>
+
+        </form>
+      </section>
+
       <!-- IMAGE CONTENT -->
       <section>
         <h2>Image section</h2>

@@ -136,6 +136,101 @@ const TEXT_CONTAINERS = [
   "LABEL", "PRE", "SUMMARY", "CAPTION", "A", "BUTTON", "IMG"
 ];
 
+/** Extract only the direct text-node content of an element (ignores child element text) */
+function directText(el: HTMLElement): string {
+  return Array.from(el.childNodes)
+    .filter(n => n.nodeType === Node.TEXT_NODE)
+    .map(n => n.textContent?.trim() || '')
+    .filter(Boolean)
+    .join(' ');
+}
+
+/**
+ * Resolve the visible label text for a form input (label element, aria-label, aria-labelledby)
+ */
+function getInputLabel(el: HTMLElement): string {
+  const labelledby = el.getAttribute("aria-labelledby");
+  if (labelledby) {
+    const labelEl = document.getElementById(labelledby.split(' ')[0]);
+    if (labelEl) return directText(labelEl) || labelEl.innerText?.trim() || '';
+  }
+  const ariaLabel = el.getAttribute("aria-label");
+  if (ariaLabel?.trim()) return ariaLabel.trim();
+  if (el.id) {
+    const labelEl = document.querySelector(`label[for="${CSS.escape(el.id)}"]`) as HTMLElement;
+    if (labelEl) return directText(labelEl) || labelEl.innerText?.trim() || '';
+  }
+  const parentLabel = el.closest('label');
+  if (parentLabel) return directText(parentLabel) || parentLabel.innerText?.trim() || '';
+  return '';
+}
+
+/**
+ * Speak a short phrase, cancelling any ongoing speech
+ */
+function speakBriefly(text: string): void {
+  readGeneration++;
+  window.speechSynthesis.cancel();
+  clearHighlight();
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.rate = speechRate;
+  window.speechSynthesis.speak(utterance);
+}
+
+/**
+ * Announce a focused input field (label + placeholder + role)
+ */
+function announceInput(el: HTMLInputElement | HTMLTextAreaElement): void {
+  const isPassword = (el as HTMLInputElement).type === 'password';
+  const label = getInputLabel(el);
+
+  let text: string;
+  if (isPassword) {
+    text = label ? `${label}, password field` : 'password field';
+  } else {
+    const parts: string[] = [];
+    if (label) parts.push(label);
+    if (el.placeholder) parts.push(el.placeholder);
+    if (!parts.length) parts.push(el.tagName === 'TEXTAREA' ? 'text area' : 'edit text');
+    text = parts.join(', ');
+  }
+
+  speakBriefly(text);
+  updateControlBarStatus("Input focused");
+}
+
+const KEY_NAMES: Record<string, string> = {
+  ' ': 'space', 'Backspace': 'backspace', 'Delete': 'delete', 'Enter': 'enter',
+  'Tab': 'tab', 'Escape': 'escape', 'ArrowLeft': 'left arrow', 'ArrowRight': 'right arrow',
+  'ArrowUp': 'up arrow', 'ArrowDown': 'down arrow', 'Home': 'home', 'End': 'end',
+  'PageUp': 'page up', 'PageDown': 'page down', 'Shift': 'shift', 'Control': 'control',
+  'Alt': 'alt', 'Meta': 'meta', 'CapsLock': 'caps lock', 'Insert': 'insert',
+};
+
+function getKeyName(key: string): string {
+  if (KEY_NAMES[key]) return KEY_NAMES[key];
+  if (/^F\d+$/.test(key)) return key; // F1–F12 spoken as-is
+  return key; // printable characters and anything else
+}
+
+/**
+ * Speak every keystroke; for password fields always say "password"
+ */
+function handleKeyInput(e: KeyboardEvent): void {
+  if (!isEnabled) return;
+  const target = e.target as HTMLElement;
+  if (target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA') return;
+  if (target.closest('.hwcag-widget') || target.closest('.hwcag-sr-controls')) return;
+
+  const isPassword = (target as HTMLInputElement).type === 'password';
+  if (isPassword) {
+    // Printable characters (letters, digits, symbols, space) → "password"; everything else → key name
+    speakBriefly(e.key.length === 1 ? 'password' : getKeyName(e.key));
+  } else {
+    speakBriefly(getKeyName(e.key));
+  }
+}
+
 /**
  * Compute the accessible name for an element
  */
@@ -321,15 +416,25 @@ function handlePageClick(e: MouseEvent): void {
   // Ignore clicks on the widget and control bar
   if (target.closest(".hwcag-widget") || target.closest(".hwcag-sr-controls")) return;
 
+  // Input/textarea clicks are handled by focusin (which fires before click); skip here
+  // to avoid cancelling the label+placeholder announcement with just the label text.
+  if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return;
+
   const textBlock = findTextBlock(target);
-  if (textBlock) {
-    // Don't block native actions on interactive elements (links, buttons, inputs)
-    const isInteractive = !!target.closest('a, button, input, select, textarea, [role="button"], [role="link"]');
-    if (!isInteractive) {
-      e.preventDefault();
-    }
-    readElement(textBlock);
+  if (!textBlock) return;
+
+  // If the resolved block is a <label> that controls an input, focusin will announce it.
+  if (textBlock.tagName === 'LABEL') {
+    const forId = textBlock.getAttribute('for');
+    const controlled = forId
+      ? document.getElementById(forId)
+      : textBlock.querySelector('input, textarea, select');
+    if (controlled) return;
   }
+
+  const isInteractive = !!target.closest('a, button, input, select, textarea, [role="button"], [role="link"]');
+  if (!isInteractive) e.preventDefault();
+  readElement(textBlock);
 }
 
 /**
@@ -342,6 +447,12 @@ function handleFocus(e: FocusEvent): void {
 
   // Ignore focus on the widget and control bar
   if (!target || target.closest(".hwcag-widget") || target.closest(".hwcag-sr-controls")) return;
+
+  // Input fields: announce label + placeholder instead of walking the DOM tree
+  if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
+    announceInput(target as HTMLInputElement | HTMLTextAreaElement);
+    return;
+  }
 
   const textBlock = findTextBlock(target);
   if (textBlock) {
@@ -493,6 +604,7 @@ function apply(enabled: boolean): void {
     }
     document.addEventListener("click", handlePageClick, true);
     document.addEventListener("focusin", handleFocus, true);
+    document.addEventListener("keydown", handleKeyInput, true);
     window.addEventListener("beforeunload", handleBeforeUnload);
     // Create control bar
     controlBar = createControlBar();
@@ -501,6 +613,7 @@ function apply(enabled: boolean): void {
   } else {
     document.removeEventListener("click", handlePageClick, true);
     document.removeEventListener("focusin", handleFocus, true);
+    document.removeEventListener("keydown", handleKeyInput, true);
     window.removeEventListener("beforeunload", handleBeforeUnload);
     stopSpeech();
     // Remove control bar
