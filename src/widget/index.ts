@@ -3,6 +3,7 @@ import { DEFAULT_CONFIG } from "./types";
 import { createButton } from "./ui/button";
 import { createPanel, getPanelStyles } from "./ui/panel";
 import { resetAll, featureActions, features } from "./features";
+import { announce } from "./features/screen-reader";
 
 let isInitialized = false;
 let buttonElement: HTMLElement | null = null;
@@ -79,9 +80,11 @@ function togglePanel(): void {
 
   if (isOpen) {
     buttonElement.style.setProperty("display", "none", "important");
+    announce("Accessibility menu opened");
   } else {
     buttonElement.style.setProperty("display", "flex", "important");
     buttonElement.classList.remove("loading");
+    announce("Accessibility menu closed");
   }
 }
 
@@ -91,12 +94,16 @@ function togglePanel(): void {
 function closePanel(): void {
   if (!panelElement || !buttonElement) return;
 
+  const wasOpen = panelElement.classList.contains("open");
+
   panelElement.classList.remove("open");
   buttonElement.classList.remove("active");
   buttonElement.setAttribute("aria-expanded", "false");
 
   buttonElement.style.setProperty("display", "flex", "important");
   buttonElement.classList.remove("loading");
+
+  if (wasOpen) announce("Accessibility menu closed");
 }
 
 /**
@@ -145,10 +152,13 @@ function moveWidget(): void {
       if (moveBtn) {
         const nextTarget = newSide === "left" ? "right" : "left";
         moveBtn.setAttribute("aria-label", `Move widget to the ${nextTarget}`);
+        moveBtn.setAttribute("title", `Move widget to the ${nextTarget}`);
         const { getMoveIcon: icon } = _iconHelpers;
         moveBtn.innerHTML = icon(nextTarget);
       }
     }
+
+    announce(`Widget moved to the ${newSide}`);
 
     // Reopen if it was open before
     if (wasOpen && panelElement) {
@@ -328,6 +338,7 @@ export function open(): void {
   buttonElement.classList.add("active");
   buttonElement.setAttribute("aria-expanded", "true");
   buttonElement.style.setProperty("display", "none", "important");
+  announce("Accessibility menu opened");
 }
 
 /**

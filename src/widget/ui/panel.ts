@@ -1,6 +1,7 @@
 import type { WidgetConfig, WidgetTheme, WidgetFeature } from "../types";
 import { DEFAULT_CONFIG } from "../types";
 import { features, featureActions, resetAll } from "../features";
+import { announce, announceReset, getValue as isScreenReaderOn } from "../features/screen-reader";
 
 function getThemeCSS(theme: WidgetTheme): string {
   const t = { ...DEFAULT_CONFIG.theme, ...theme };
@@ -432,6 +433,7 @@ function createToggleCard(
   labelText: string,
   initialValue: boolean,
   onChange: () => void,
+  skipAnnounce = false,
 ): HTMLElement {
   const card = document.createElement("button");
   card.className = `hwcag-feature-card${initialValue ? " active" : ""}`;
@@ -465,6 +467,7 @@ function createToggleCard(
     card.setAttribute("aria-checked", String(isActive));
     card.setAttribute("aria-label", `${labelText}: ${isActive ? "On" : "Off"}`);
     toggle.update(isActive);
+    if (!skipAnnounce) announce(`${labelText} ${isActive ? "on" : "off"}`);
     document.dispatchEvent(new CustomEvent("hwcag:stateChange"));
   });
 
@@ -523,6 +526,7 @@ function createStepperCard(
       `${labelText}: level ${currentLevel} of ${numLevels - 1}`,
     );
     dots.update(currentLevel);
+    announce(currentLevel === 0 ? `${labelText} normal` : `${labelText} level ${currentLevel} of ${numLevels - 1}`);
     document.dispatchEvent(new CustomEvent("hwcag:stateChange"));
   });
 
@@ -595,6 +599,7 @@ function createSelectCard(
     }
 
     dots.update(currentIndex);
+    announce(`${labelText}: ${newOption}`);
     document.dispatchEvent(new CustomEvent("hwcag:stateChange"));
   });
 
@@ -626,7 +631,10 @@ function createActionCard(
   card.appendChild(iconEl);
   card.appendChild(labelEl);
 
-  card.addEventListener("click", onClick);
+  card.addEventListener("click", () => {
+    onClick();
+    announce(labelText);
+  });
 
   return card;
 }
@@ -650,6 +658,7 @@ function createFeatureCard(featureName: WidgetFeature): HTMLElement {
         feature.label,
         (actions as any).getValue(),
         (actions as any).toggle,
+        featureName === "screenReader",
       );
     case "stepper": {
       const ui = STEPPER_UI[featureName] ?? { step: 1, numLevels: 5 };
@@ -764,7 +773,9 @@ export function createPanel(
   resetBtn.innerHTML = `${RESET_ICON} Reset Settings`;
   resetBtn.addEventListener("click", () => {
 
+    const readerWasOn = isScreenReaderOn();
     resetAll();
+    if (readerWasOn) announceReset();
     document.dispatchEvent(new CustomEvent("hwcag:reset"));
   });
 

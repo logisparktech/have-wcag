@@ -128,6 +128,36 @@ let speechRate = 1.0;
 let isPaused = false;
 let hintTimeout: ReturnType<typeof setTimeout> | null = null;
 let readGeneration = 0; // tracks active read session to prevent stale callbacks
+let audioCtx: AudioContext | null = null;
+
+/** Lazily create a shared AudioContext (must be created after a user gesture) */
+function getAudioCtx(): AudioContext {
+  if (!audioCtx) audioCtx = new AudioContext();
+  return audioCtx;
+}
+
+/** Short beep, mirroring NVDA's focus/activation audio cues */
+function playTone(freq: number, duration = 60): void {
+  try {
+    const ctx = getAudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.frequency.value = freq;
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    const now = ctx.currentTime;
+    gain.gain.setValueAtTime(0.05, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + duration / 1000);
+    osc.start(now);
+    osc.stop(now + duration / 1000);
+  } catch {
+    // AudioContext unavailable/blocked — sound cues are a nice-to-have, not critical
+  }
+}
+
+const INTERACTIVE_SELECTOR = 'a, button, input, select, textarea, [role="button"], [role="link"]';
+const playFocusTone = () => playTone(700, 50);
+const playActivateTone = () => playTone(350, 70);
 
 // Block-level text containers to detect
 const TEXT_CONTAINERS = [
@@ -178,24 +208,64 @@ function speakBriefly(text: string): void {
 }
 
 /**
- * Announce a focused input field (label + placeholder + role)
+ * Resolve the error / validation message associated with an input, the way
+ * NVDA does — via aria-describedby / aria-errormessage, plus a Quasar fallback
+ * (the .q-field__messages element rendered next to the input when invalid).
+ */
+function getInputErrorMessage(el: HTMLElement): string {
+  const ids = [
+    el.getAttribute("aria-errormessage"),
+    el.getAttribute("aria-describedby"),
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .split(/\s+/)
+    .filter(Boolean);
+
+  for (const id of ids) {
+    const msgEl = document.getElementById(id);
+    const msg = msgEl?.innerText?.trim();
+    if (msg) return msg;
+  }
+
+  // Quasar fallback: error text lives in .q-field__messages within the field wrapper
+  const field = el.closest(".q-field--error, .q-field");
+  if (field) {
+    const msgEl = field.querySelector<HTMLElement>(".q-field__messages [role='alert'], .q-field__messages");
+    const msg = msgEl?.innerText?.trim();
+    if (msg) return msg;
+  }
+  return "";
+}
+
+/** True when the field is marked required via attribute or ARIA (Quasar sets aria-required). */
+function isInputRequired(el: HTMLElement): boolean {
+  return (el as HTMLInputElement).required || el.getAttribute("aria-required") === "true";
+}
+
+/**
+ * Announce a focused input field (label + placeholder + role + required + error)
  */
 function announceInput(el: HTMLInputElement | HTMLTextAreaElement): void {
   const isPassword = (el as HTMLInputElement).type === 'password';
   const label = getInputLabel(el);
 
-  let text: string;
+  const parts: string[] = [];
   if (isPassword) {
-    text = label ? `${label}, password field` : 'password field';
+    parts.push(label ? `${label}, password field` : 'password field');
   } else {
-    const parts: string[] = [];
     if (label) parts.push(label);
     if (el.placeholder) parts.push(el.placeholder);
     if (!parts.length) parts.push(el.tagName === 'TEXTAREA' ? 'text area' : 'edit text');
-    text = parts.join(', ');
   }
 
-  speakBriefly(text);
+  if (isInputRequired(el)) parts.push('required');
+
+  const invalid = el.getAttribute('aria-invalid') === 'true' || !!el.closest('.q-field--error');
+  const errorMsg = getInputErrorMessage(el);
+  if (invalid && errorMsg) parts.push(errorMsg);
+
+  speakBriefly(parts.join(', '));
   updateControlBarStatus("Input focused");
 }
 
@@ -432,8 +502,9 @@ function handlePageClick(e: MouseEvent): void {
     if (controlled) return;
   }
 
-  const isInteractive = !!target.closest('a, button, input, select, textarea, [role="button"], [role="link"]');
+  const isInteractive = !!target.closest(INTERACTIVE_SELECTOR);
   if (!isInteractive) e.preventDefault();
+  if (isInteractive) playActivateTone();
   readElement(textBlock);
 }
 
@@ -447,6 +518,8 @@ function handleFocus(e: FocusEvent): void {
 
   // Ignore focus on the widget and control bar
   if (!target || target.closest(".hwcag-widget") || target.closest(".hwcag-sr-controls")) return;
+
+  if (target.closest(INTERACTIVE_SELECTOR)) playFocusTone();
 
   // Input fields: announce label + placeholder instead of walking the DOM tree
   if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
@@ -594,6 +667,7 @@ function handleBeforeUnload(): void {
  * Apply screen reader
  */
 function apply(enabled: boolean): void {
+  const wasEnabled = isEnabled;
   isEnabled = enabled;
   injectStyles();
 
@@ -610,12 +684,18 @@ function apply(enabled: boolean): void {
     controlBar = createControlBar();
     document.body.appendChild(controlBar);
     showHint();
+    if (!wasEnabled) {
+      window.speechSynthesis.speak(new SpeechSynthesisUtterance("Screen reader turned on"));
+    }
   } else {
     document.removeEventListener("click", handlePageClick, true);
     document.removeEventListener("focusin", handleFocus, true);
     document.removeEventListener("keydown", handleKeyInput, true);
     window.removeEventListener("beforeunload", handleBeforeUnload);
     stopSpeech();
+    if (wasEnabled && !suppressToggleSpeech) {
+      window.speechSynthesis.speak(new SpeechSynthesisUtterance("Screen reader turned off"));
+    }
     // Remove control bar
     controlBar?.remove();
     controlBar = null;
@@ -623,14 +703,41 @@ function apply(enabled: boolean): void {
     if (hintTimeout) clearTimeout(hintTimeout);
     hintEl?.remove();
     hintEl = null;
+    audioCtx?.close();
+    audioCtx = null;
   }
+}
+
+/**
+ * Speak a panel/widget action (e.g. "Dark Mode on") when the reader is enabled.
+ * Panel UI is excluded from click/focus reading, so callers must announce explicitly.
+ */
+export function announce(text: string): void {
+  if (!isEnabled) return;
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(new SpeechSynthesisUtterance(text));
+}
+
+// Set while a global "reset all" is turning the reader off, so apply() skips
+// its "Screen reader turned off" line — the reset flow speaks its own message instead.
+let suppressToggleSpeech = false;
+
+/**
+ * Speak the reset confirmation. Bypasses the isEnabled check because reset()
+ * has already flipped the reader off by the time this is called.
+ */
+export function announceReset(): void {
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(new SpeechSynthesisUtterance("Accessibility settings reset"));
 }
 
 /**
  * Reset to default
  */
 function reset(): void {
+  suppressToggleSpeech = true;
   apply(false);
+  suppressToggleSpeech = false;
   isEnabled = false;
 }
 
