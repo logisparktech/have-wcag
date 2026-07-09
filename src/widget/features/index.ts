@@ -87,7 +87,7 @@ import {
   getValue as getGrayscaleValue,
 } from "./grayscale";
 
-import type { FeatureModule, WidgetFeature } from "../types";
+import type { FeatureModule, WidgetFeature, WidgetState } from "../types";
 
 /**
  * All feature modules
@@ -205,6 +205,19 @@ export const featureActions = {
     reset: grayscaleFeature.reset,
   },
 };
+
+/**
+ * Current state of all (non-transient) features — matches what's persisted to localStorage
+ */
+export function getCurrentState(): WidgetState {
+  const state: Record<string, any> = {};
+  Object.entries(featureActions).forEach(([key, actions]) => {
+    if (!features[key as WidgetFeature]?.transient) {
+      state[key] = (actions as any).getValue();
+    }
+  });
+  return state as WidgetState;
+}
 
 /**
  * Reset all features to default

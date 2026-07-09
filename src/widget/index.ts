@@ -2,7 +2,7 @@ import type { WidgetConfig, WidgetPosition } from "./types";
 import { DEFAULT_CONFIG } from "./types";
 import { createButton } from "./ui/button";
 import { createPanel, getPanelStyles } from "./ui/panel";
-import { resetAll, featureActions, features } from "./features";
+import { resetAll, features, getCurrentState } from "./features";
 import { announce } from "./features/screen-reader";
 
 let isInitialized = false;
@@ -13,24 +13,11 @@ let currentConfig: WidgetConfig = {};
 const STATE_KEY = "hwcag-state";
 
 /**
- * Get current state across all features
- */
-function getCurrentState(): Record<string, any> {
-  const state: Record<string, any> = {};
-  Object.entries(featureActions).forEach(([key, actions]) => {
-    if (!features[key as keyof typeof features]?.transient) {
-      state[key] = (actions as any).getValue();
-    }
-  });
-  return state;
-}
-
-/**
  * Save current state (features + position) to localStorage
  */
 function saveState(): void {
   try {
-    const state = getCurrentState();
+    const state: Record<string, any> = getCurrentState();
     state.__position = currentConfig.position ?? DEFAULT_CONFIG.position;
     localStorage.setItem(STATE_KEY, JSON.stringify(state));
   } catch (e) {
@@ -353,20 +340,7 @@ export function close(): void {
  */
 export function reset(): void {
   resetAll();
-
-  if (panelElement?.classList.contains("open")) {
-    const newPanel = createPanel(currentConfig, moveWidget);
-    newPanel.classList.add("open");
-    if (buttonElement)
-      buttonElement.style.setProperty("display", "none", "important");
-    panelElement.replaceWith(newPanel);
-    panelElement = newPanel;
-
-    const closeBtn = panelElement.querySelector(".hwcag-panel-close");
-    if (closeBtn) {
-      closeBtn.addEventListener("click", closePanel);
-    }
-  }
+  document.dispatchEvent(new CustomEvent("hwcag:reset", { detail: { state: getCurrentState() } }));
 }
 
 // Export types

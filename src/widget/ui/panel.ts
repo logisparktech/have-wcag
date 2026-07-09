@@ -1,6 +1,6 @@
 import type { WidgetConfig, WidgetTheme, WidgetFeature } from "../types";
 import { DEFAULT_CONFIG } from "../types";
-import { features, featureActions, resetAll } from "../features";
+import { features, featureActions, resetAll, getCurrentState } from "../features";
 import { announce, announceReset, getValue as isScreenReaderOn } from "../features/screen-reader";
 
 function getThemeCSS(theme: WidgetTheme): string {
@@ -429,6 +429,7 @@ function createToggleSwitch(
 }
 
 function createToggleCard(
+  featureName: string,
   icon: string,
   labelText: string,
   initialValue: boolean,
@@ -468,13 +469,14 @@ function createToggleCard(
     card.setAttribute("aria-label", `${labelText}: ${isActive ? "On" : "Off"}`);
     toggle.update(isActive);
     if (!skipAnnounce) announce(`${labelText} ${isActive ? "on" : "off"}`);
-    document.dispatchEvent(new CustomEvent("hwcag:stateChange"));
+    document.dispatchEvent(new CustomEvent("hwcag:stateChange", { detail: { key: featureName, value: isActive, state: getCurrentState() } }));
   });
 
   return card;
 }
 
 function createStepperCard(
+  featureName: string,
   icon: string,
   labelText: string,
   getValue: () => number,
@@ -527,13 +529,14 @@ function createStepperCard(
     );
     dots.update(currentLevel);
     announce(currentLevel === 0 ? `${labelText} normal` : `${labelText} level ${currentLevel} of ${numLevels - 1}`);
-    document.dispatchEvent(new CustomEvent("hwcag:stateChange"));
+    document.dispatchEvent(new CustomEvent("hwcag:stateChange", { detail: { key: featureName, value: getValue(), state: getCurrentState() } }));
   });
 
   return card;
 }
 
 function createSelectCard(
+  featureName: string,
   icon: string,
   labelText: string,
   options: string[],
@@ -600,7 +603,7 @@ function createSelectCard(
 
     dots.update(currentIndex);
     announce(`${labelText}: ${newOption}`);
-    document.dispatchEvent(new CustomEvent("hwcag:stateChange"));
+    document.dispatchEvent(new CustomEvent("hwcag:stateChange", { detail: { key: featureName, value: newOption, state: getCurrentState() } }));
   });
 
   return card;
@@ -654,6 +657,7 @@ function createFeatureCard(featureName: WidgetFeature): HTMLElement {
   switch (feature.type) {
     case "toggle":
       return createToggleCard(
+        featureName,
         feature.icon,
         feature.label,
         (actions as any).getValue(),
@@ -663,6 +667,7 @@ function createFeatureCard(featureName: WidgetFeature): HTMLElement {
     case "stepper": {
       const ui = STEPPER_UI[featureName] ?? { step: 1, numLevels: 5 };
       return createStepperCard(
+        featureName,
         feature.icon,
         feature.label,
         (actions as any).getValue,
@@ -675,6 +680,7 @@ function createFeatureCard(featureName: WidgetFeature): HTMLElement {
     case "select": {
       const opts: string[] = (feature as any).options ?? [];
       return createSelectCard(
+        featureName,
         feature.icon,
         feature.label,
         opts,
@@ -776,7 +782,7 @@ export function createPanel(
     const readerWasOn = isScreenReaderOn();
     resetAll();
     if (readerWasOn) announceReset();
-    document.dispatchEvent(new CustomEvent("hwcag:reset"));
+    document.dispatchEvent(new CustomEvent("hwcag:reset", { detail: { state: getCurrentState() } }));
   });
 
   const branding = document.createElement("p");

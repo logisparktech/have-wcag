@@ -91,6 +91,35 @@ export interface FeatureModule {
 }
 
 /**
+ * Detail payload for the "hwcag:stateChange" event, fired whenever a single
+ * setting is changed via the panel.
+ */
+export interface HwcagStateChangeDetail {
+  /** The feature/setting key that changed, e.g. "textSize" */
+  key: WidgetFeature;
+  /** The new value of that setting */
+  value: string | number | boolean;
+  /** Full current state of all features — same shape as what's persisted to localStorage */
+  state: WidgetState;
+}
+
+/**
+ * Detail payload for the "hwcag:reset" event, fired whenever all settings
+ * are reset to default (via the panel's Reset button or the reset() API).
+ */
+export interface HwcagResetDetail {
+  /** Full state after reset (matches DEFAULT_STATE) */
+  state: WidgetState;
+}
+
+declare global {
+  interface DocumentEventMap {
+    "hwcag:stateChange": CustomEvent<HwcagStateChangeDetail>;
+    "hwcag:reset": CustomEvent<HwcagResetDetail>;
+  }
+}
+
+/**
  * Default widget configuration
  */
 export const DEFAULT_CONFIG: Required<WidgetConfig> = {
