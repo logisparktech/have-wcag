@@ -434,6 +434,7 @@ function createToggleCard(
   labelText: string,
   initialValue: boolean,
   onChange: () => void,
+  getValue: () => boolean,
   skipAnnounce = false,
 ): HTMLElement {
   const card = document.createElement("button");
@@ -464,7 +465,8 @@ function createToggleCard(
   card.addEventListener("click", () => {
 
     onChange();
-    const isActive = card.classList.toggle("active");
+    const isActive = getValue();
+    card.classList.toggle("active", isActive);
     card.setAttribute("aria-checked", String(isActive));
     card.setAttribute("aria-label", `${labelText}: ${isActive ? "On" : "Off"}`);
     toggle.update(isActive);
@@ -662,6 +664,7 @@ function createFeatureCard(featureName: WidgetFeature): HTMLElement {
         feature.label,
         (actions as any).getValue(),
         (actions as any).toggle,
+        (actions as any).getValue,
         featureName === "screenReader",
       );
     case "stepper": {
@@ -716,7 +719,6 @@ export function createPanel(
   panel.className = "hwcag-widget hwcag-widget-panel";
   panel.style.cssText = getThemeCSS(theme);
   panel.setAttribute("role", "dialog");
-  panel.setAttribute("aria-modal", "true");
   panel.setAttribute("aria-labelledby", "hwcag-panel-title");
 
   // Header
